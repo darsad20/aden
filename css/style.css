@@ -1,0 +1,128 @@
+/* متغيرات الألوان */
+:root {
+  --primary-color: #003366; /* أزرق داكن رسمي */
+  --secondary-color: #f4f5f7; /* خلفية فاتحة */
+  --text-color: #333;
+}
+
+/* إعداد الخطوط والتنسيق العام */
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Cairo', sans-serif;
+  font-size: 16px;
+  color: var(--text-color);
+  direction: rtl;
+  text-align: center;
+}
+
+/* خلفية الصفحة */
+.bg-body {
+  background-color: var(--secondary-color);
+  min-height: 100vh;
+}
+
+/* الشعار في index و dashboard بحجم 400 */
+.logo-index, .logo-dashboard {
+  width: 400px;
+  max-width: 100%;
+}
+
+/* البطاقات الرسمية */
+.custom-card {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin: 30px auto;
+  padding: 25px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+.custom-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* ترويسة البطاقة */
+.card-header {
+  border-top-left-radius: 8px !important;
+  border-top-right-radius: 8px !important;
+  background-color: var(--primary-color) !important;
+  color: #fff !important;
+  padding: 10px 15px;
+  text-align: center;
+}
+
+/* عناوين البطاقات */
+.card-title {
+  font-size: 1.4rem;
+  color: #212529;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+/* تنسيق الجدول داخل البطاقة */
+.table {
+  width: 100%;
+}
+.table th,
+.table td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 100px; /* تعديل حسب الحاجة */
+}
+.table th {
+  background-color: #f2f2f2;
+  width: 30%;
+}
+
+/* تنسيق الرسائل */
+.message {
+  font-weight: bold;
+  color: red;
+}
+
+/* تنسيق الحقول */
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 6px rgba(0,51,102,0.3);
+}
+
+/* تنسيق الأزرار */
+.btn {
+  border-radius: 4px;
+  font-weight: 600;
+  transition: background-color 0.3s, transform 0.3s;
+}
+.btn:hover {
+  transform: scale(1.01);
+}
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+.btn-primary:hover {
+  background-color: #002244;
+  border-color: #002244;
+}
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+.btn-success:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
+.btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+.btn-secondary:hover {
+  background-color: #5a6268;
+  border-color: #545b62;
+}
+
+/* تنسيق Toast */
+.custom-toast {
+  border-radius: 5px;
+  font-weight: 600;
+}
