@@ -5,18 +5,29 @@
   <title>لوحة التحكم - نظام الرعاية الطبية</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="نظام الرعاية الطبية - لوحة التحكم">
-  <!-- خط Cairo -->
+  
+  <!-- استدعاء خط Cairo -->
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+  
   <!-- Bootswatch Litera Theme -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/litera/bootstrap.min.css">
-  <!-- أيقونات Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" 
+        integrity="sha512-Fo3rlrZj/k7ujTnH/PRuTCE4aZIS0+qj4Yk2r1MTx1Y9GgZVN2j8G5zYVrxY5gJ5fH8E3VzX1uZpXv9q0Z9d3g==" 
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- مكتبة Flatpickr لتخصيص مدخلات التاريخ والوقت -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  
   <!-- ملف التنسيقات المخصص -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-body">
-  <div class="container text-center py-4">
+  <div class="container text-center py-4 fade-in">
     <img src="images/pic.png" alt="شعار الوزارة" class="logo-dashboard" aria-label="شعار الوزارة">
+    <!-- عنوان بارز تحت الشعار -->
+    <h2 class="slogan">الرعاية الصحية للحجاج 1446هـ</h2>
   </div>
   
   <div class="container mb-5">
@@ -32,6 +43,8 @@
             <button class="btn btn-primary" onclick="searchPilgrim()">
               <i class="fa fa-search"></i> بحث
             </button>
+            <!-- رسالة توضيحية تظهر عند عدم العثور على نتائج أو أخطاء -->
+            <p id="searchMessage" class="message mt-2"></p>
           </div>
         </div>
   
@@ -40,9 +53,7 @@
           <div class="card-header text-center">
             <h5 class="mb-0 fw-bold"><i class="fa-solid fa-user"></i> بيانات الحاج</h5>
           </div>
-          <div class="card-body bg-white" id="pilgrimInfo">
-            <!-- بيانات الحاج تظهر هنا -->
-          </div>
+          <div class="card-body bg-white" id="pilgrimInfo"></div>
           <div class="card-footer text-center bg-light">
             <button class="btn btn-medical me-2" id="addDataBtn" onclick="openModal()">
               <i class="fa fa-plus-circle"></i> إضافة بيانات علاجية
@@ -59,10 +70,10 @@
     </div>
   </div>
   
-  <!-- نافذة إضافة بيانات علاجية -->
+  <!-- مودال إضافة بيانات علاجية -->
   <div class="modal fade" id="addDataModal" tabindex="-1" aria-labelledby="addDataModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content custom-card">
+    <div class="modal-dialog modal-lg" style="position: relative;">
+      <div class="modal-content custom-card fade-in">
         <div class="modal-header justify-content-center">
           <h5 class="modal-title w-100 fw-bold" id="addDataModalLabel">إضافة بيانات علاجية</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
@@ -71,30 +82,106 @@
           <form id="treatmentForm" class="text-end">
             <input type="hidden" id="hiddenPassport">
             <div class="mb-3">
-              <textarea class="form-control" id="diagnosis" rows="2" placeholder="التشخيص"></textarea>
+              <input type="text" class="form-control" id="doctorName" placeholder="اسم الطبيب" required>
             </div>
             <div class="mb-3">
-              <textarea class="form-control" id="prescription" rows="2" placeholder="الوصفة الطبية"></textarea>
+              <input type="text" class="form-control" id="hotel" placeholder="الفندق" required>
             </div>
             <div class="mb-3">
-              <textarea class="form-control" id="treatmentNotes" rows="2" placeholder="الملاحظات"></textarea>
+              <input type="text" class="form-control" id="treatmentDate" placeholder="تاريخ العلاج" required>
+            </div>
+            <div class="mb-3">
+              <input type="text" class="form-control" id="treatmentTime" placeholder="الوقت" required>
+            </div>
+            <div class="mb-3">
+              <label for="conservatory" class="form-label">المحافظة</label>
+              <select id="conservatory" class="form-control" required>
+                <option value="">اختر المحافظة</option>
+                <option value="صنعاء">صنعاء</option>
+                <option value="عمران">عمران</option>
+                <option value="ذمار">ذمار</option>
+                <option value="صعده">صعده</option>
+                <option value="تعز">تعز</option>
+                <option value="اب">اب</option>
+                <option value="الحديده">الحديده</option>
+                <option value="ريمه">ريمه</option>
+                <option value="المحويت">المحويت</option>
+                <option value="حجه">حجه</option>
+                <option value="حضرموت">حضرموت</option>
+                <option value="سقطرى">سقطرى</option>
+                <option value="شبوه">شبوه</option>
+                <option value="المهره">المهره</option>
+                <option value="مارب">مارب</option>
+                <option value="البيضاء">البيضاء</option>
+                <option value="الجوف">الجوف</option>
+                <option value="عدن">عدن</option>
+                <option value="ابين">ابين</option>
+                <option value="لحج">لحج</option>
+                <option value="الضالع">الضالع</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="maritalStatus" class="form-label">الحالة الاجتماعية</label>
+              <select id="maritalStatus" class="form-control" required>
+                <option value="">اختر الحالة الاجتماعية</option>
+                <option value="عازب">عازب</option>
+                <option value="متزوج">متزوج</option>
+                <option value="مطلق">مطلق</option>
+                <option value="أرمل">أرمل</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="diseaseType" class="form-label">الحالة المرضية</label>
+              <select id="diseaseType" class="form-control" required>
+                <option value="">اختر الحالة المرضية</option>
+                <option value="عدوى الفيروسات">عدوى الفيروسات</option>
+                <option value="عدوى البكتيريا">عدوى البكتيريا</option>
+                <option value="عدوى الفطريات">عدوى الفطريات</option>
+                <option value="عدوى الطفيليات">عدوى الطفيليات</option>
+                <option value="أمراض السكري والغدد الصماء">أمراض السكري والغدد الصماء</option>
+                <option value="أمراض القلب والأوعية الدموية">أمراض القلب والأوعية الدموية</option>
+                <option value="أمراض الجهاز التنفسي">أمراض الجهاز التنفسي</option>
+                <option value="أمراض الأورام السرطانية">أمراض الأورام السرطانية</option>
+                <option value="الأمراض النفسية أو الذهنية">الأمراض النفسية أو الذهنية</option>
+                <option value="أمراض الفشل الكلوي">أمراض الفشل الكلوي</option>
+                <option value="مرضى زراعة الأعضاء (الكلى وغيرها)">مرضى زراعة الأعضاء (الكلى وغيرها)</option>
+                <option value="أمراض الدم">أمراض الدم</option>
+                <option value="أمراض المناعة">أمراض المناعة</option>
+                <option value="الأمراض الجلدية">الأمراض الجلدية</option>
+                <option value="حوادث السير">حوادث السير</option>
+                <option value="الحروق وضربات الشمس">الحروق وضربات الشمس</option>
+                <option value="أخرى">أخرى</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <textarea class="form-control" id="diagnosis" rows="2" placeholder="التشخيص" required></textarea>
+            </div>
+            <div class="mb-3">
+              <textarea class="form-control" id="prescription" rows="2" placeholder="الوصفة الطبية" required></textarea>
+            </div>
+            <div class="mb-3">
+              <input type="text" class="form-control" id="treatmentDispensing" placeholder="صرف العلاج" required>
+            </div>
+            <div class="mb-3">
+              <textarea class="form-control" id="additionalNotes" rows="2" placeholder="ملاحظات"></textarea>
             </div>
           </form>
         </div>
-        <div class="modal-footer justify-content-center">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
-          <button type="button" class="btn btn-primary" onclick="saveTreatmentData()">حفظ البيانات</button>
+        <!-- ترتيب الأزرار جنبًا إلى جنب في المنتصف -->
+        <div class="modal-footer d-flex justify-content-center">
+          <button type="button" class="btn btn-primary mx-2" onclick="saveTreatmentData()">حفظ البيانات</button>
+          <button type="button" class="btn btn-secondary mx-2" data-bs-dismiss="modal">إغلاق</button>
         </div>
       </div>
     </div>
   </div>
   
-  <!-- نافذة التفاصيل التفصيلية (للتعديل والحذف) -->
+  <!-- مودال التفاصيل -->
   <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-      <div class="modal-content custom-card">
+      <div class="modal-content custom-card fade-in">
         <div class="modal-header justify-content-center">
-          <h5 class="modal-title w-100 fw-bold" id="detailModalLabel">تفاصيل الحاج</h5>
+          <h5 class="modal-title w-100 fw-bold" id="detailModalLabel">تفاصيل الحاج والبيانات العلاجية</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
         </div>
         <div class="modal-body">
@@ -118,10 +205,10 @@
               <input type="text" class="form-control" id="detailAge" placeholder="العمر">
             </div>
             <div class="mb-2">
-              <input type="text" class="form-control" id="detailHealth" placeholder="الحالة المرضية">
+              <input type="text" class="form-control" id="detailHealth" placeholder="المرض المزمن">
             </div>
             <div class="mb-2">
-              <input type="text" class="form-control" id="detailTreatmentName" placeholder="اسم العلاج المستخدم">
+              <input type="text" class="form-control" id="detailTreatmentName" placeholder="اسم الطبيب">
             </div>
             <div class="mb-2">
               <textarea class="form-control" id="detailDiagnosis" rows="2" placeholder="التشخيص"></textarea>
@@ -132,22 +219,40 @@
             <div class="mb-2">
               <textarea class="form-control" id="detailNotes" rows="2" placeholder="الملاحظات"></textarea>
             </div>
+            <div class="mb-2">
+              <input type="text" class="form-control" id="detailTreatmentDate" placeholder="تاريخ العلاج">
+            </div>
+            <div class="mb-2">
+              <input type="text" class="form-control" id="detailTreatmentTime" placeholder="الوقت">
+            </div>
+            <div class="mb-2">
+              <input type="text" class="form-control" id="detailConservatory" placeholder="المحافظة">
+            </div>
+            <div class="mb-2">
+              <input type="text" class="form-control" id="detailMaritalStatus" placeholder="الحالة الاجتماعية">
+            </div>
+            <div class="mb-2">
+              <input type="text" class="form-control" id="detailDiseaseType" placeholder="الحالة المرضية">
+            </div>
+            <div class="mb-2">
+              <input type="text" class="form-control" id="detailTreatmentDispensing" placeholder="صرف العلاج">
+            </div>
           </form>
         </div>
         <div class="modal-footer justify-content-center">
-          <button type="button" class="btn btn-danger me-2" onclick="deleteDetails()">
+          <button type="button" class="btn btn-danger mx-2" onclick="deleteDetails()">
             <i class="fa fa-trash"></i> حذف
           </button>
-          <button type="button" class="btn btn-warning me-2" onclick="editDetails()">
+          <button type="button" class="btn btn-warning mx-2" onclick="editDetails()">
             <i class="fa fa-edit"></i> تعديل
           </button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+          <button type="button" class="btn btn-secondary mx-2" data-bs-dismiss="modal">إغلاق</button>
         </div>
       </div>
     </div>
   </div>
   
-  <!-- Toast لرسائل النجاح -->
+  <!-- Toast رسائل النجاح -->
   <div class="position-fixed top-50 start-50 translate-middle p-3" style="z-index: 9999;">
     <div id="successToast" class="toast align-items-center text-white bg-success border-0 custom-toast" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="d-flex">
@@ -157,7 +262,7 @@
     </div>
   </div>
   
-  <!-- Toast للرسائل الخطأ -->
+  <!-- Toast رسائل الخطأ -->
   <div class="position-fixed top-50 start-50 translate-middle p-3" style="z-index: 9999;">
     <div id="errorToast" class="toast align-items-center text-white bg-danger border-0 custom-toast" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="d-flex">
@@ -169,5 +274,7 @@
   
   <script src="js/script.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
 </body>
 </html>
