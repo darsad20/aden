@@ -1,11 +1,10 @@
-/* متغيرات الألوان */
 :root {
-  --primary-color: #003366; /* أزرق داكن رسمي */
-  --secondary-color: #f4f5f7; /* خلفية فاتحة */
+  --primary-color: #003366;
+  --secondary-color: #f4f5f7;
   --text-color: #333;
 }
 
-/* الإعدادات العامة */
+/* تنسيقات عامة */
 body, html {
   margin: 0;
   padding: 0;
@@ -26,7 +25,7 @@ body, html {
   max-width: 100%;
 }
 
-/* تأثير ظهور تدريجي */
+/* تأثير ظهور */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -35,6 +34,7 @@ body, html {
   animation: fadeIn 0.5s ease-in;
 }
 
+/* الكروت */
 .custom-card {
   background-color: #fff;
   border: 1px solid #ccc;
@@ -49,6 +49,7 @@ body, html {
   transform: scale(1.01);
 }
 
+/* رأس الكارت */
 .card-header {
   border-top-left-radius: 8px !important;
   border-top-right-radius: 8px !important;
@@ -65,19 +66,21 @@ body, html {
   margin-bottom: 1rem;
 }
 
+/* الجداول */
 .table {
   width: 100%;
 }
+
+.table-responsive {
+  margin-top: 15px;
+}
+
 .table th,
 .table td {
   white-space: nowrap;
-  overflow: hidden;
   text-overflow: ellipsis;
-  min-width: 100px;
-}
-.table th {
-  background-color: #f2f2f2;
-  width: 30%;
+  min-width: 90px;
+  vertical-align: middle;
 }
 
 .message {
@@ -85,23 +88,25 @@ body, html {
   color: red;
 }
 
+/* تركيز الحقول */
 .form-control:focus {
   border-color: var(--primary-color);
   box-shadow: 0 0 6px rgba(0,51,102,0.3);
 }
 
-/* تكبير الأزرار */
+/* الأزرار */
 .btn {
   border-radius: 4px;
   font-weight: 600;
-  font-size: 1rem;
-  padding: 0.75rem 1.25rem;
+  font-size: 0.9rem;
+  padding: 0.5rem 1.2rem;
   transition: background-color 0.3s, transform 0.3s;
 }
 .btn:hover {
   transform: scale(1.01);
 }
 
+/* أزرار مخصصة */
 .btn-medical {
   background-color: #c8e6c9;
   color: #333;
@@ -122,6 +127,17 @@ body, html {
   color: #333;
 }
 
+/* زر تصدير PDF */
+.btn-pdf {
+  background-color: #b71c1c;
+  color: #fff;
+  border: none;
+}
+.btn-pdf:hover {
+  background-color: #d32f2f;
+  color: #fff;
+}
+
 .custom-toast {
   border-radius: 5px;
   font-weight: 600;
@@ -131,17 +147,21 @@ select.form-control {
   text-align: right;
 }
 
-/* Flatpickr: نستخدم appendTo لتحديد مكان التقويم داخل المودال */
-.flatpickr-calendar {
-  left: auto !important;
-  right: auto !important;
+.input-group-text {
+  background-color: #e9ecef;
+  border: 1px solid #ced4da;
 }
 
-/* نمط الشعار الرسمي في صفحة البحث */
 .slogan {
   white-space: nowrap;
   font-size: 1.5rem;
   color: var(--primary-color);
   margin-top: 8px;
   font-weight: 700;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: var(--primary-color);
+  color: #fff !important;
+  border: none;
 }

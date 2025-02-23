@@ -1,143 +1,73 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbzqMUQDOGqbPVCkgULOKUzT2pOGyMC1UpQNFOa9PrppI63lcNArIeAwGk0fPThRDjy_/exec";
+"use strict";
 
-// دالة لمركزة تقاويم Flatpickr داخل مودال "إضافة بيانات علاجية"
-function centerCalendar(instance) {
-  const modalDialog = document.querySelector('#addDataModal .modal-dialog');
-  if (!modalDialog) return;
-  // التأكد من أن modalDialog يحمل position: relative
-  modalDialog.style.position = 'relative';
-  const calendar = instance.calendarContainer;
-  // تعيين position: absolute ليكون التقويم داخل modalDialog
-  calendar.style.position = 'absolute';
-  setTimeout(() => {
-    const calWidth = calendar.offsetWidth;
-    const calHeight = calendar.offsetHeight;
-    calendar.style.top = ((modalDialog.offsetHeight - calHeight) / 2) + 'px';
-    calendar.style.left = ((modalDialog.offsetWidth - calWidth) / 2) + 'px';
-  }, 0);
+// استخدام رابط النشر الجديد
+const API_URL = "https://script.google.com/macros/s/AKfycbzQj6Y11vp37WHSK9CgbULckuCTn1rfq0dN1DUbQuW989WVIvozIlp3jPWObynazN5x/exec";
+
+// دوال مساعدة لعرض رسائل الخطأ/النجاح باستخدام SweetAlert2
+function showErrorToast(msg) {
+  Swal.fire({
+    icon: 'error',
+    title: 'خطأ',
+    text: msg,
+    confirmButtonText: 'حسناً'
+  });
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-  // تهيئة Flatpickr لمدخلات التاريخ والوقت داخل المودال باستخدام appendTo لتحديد modal-dialog كحاوية
-  flatpickr("#treatmentDate", { 
-    locale: "ar", 
-    dateFormat: "d-m-Y",
-    appendTo: document.querySelector('#addDataModal .modal-dialog'),
-    onOpen: function(selectedDates, dateStr, instance) {
-      centerCalendar(instance);
-    }
+function showSuccessToast(msg) {
+  Swal.fire({
+    icon: 'success',
+    title: 'نجاح',
+    text: msg,
+    confirmButtonText: 'حسناً'
   });
-  flatpickr("#treatmentTime", { 
-    enableTime: true, 
-    noCalendar: true, 
-    dateFormat: "H:i", 
-    time_24hr: true, 
-    locale: "ar",
-    appendTo: document.querySelector('#addDataModal .modal-dialog'),
-    onOpen: function(selectedDates, dateStr, instance) {
-      centerCalendar(instance);
-    }
-  });
-  flatpickr("#detailTreatmentDate", { 
-    locale: "ar", 
-    dateFormat: "d-m-Y" 
-  });
-  flatpickr("#detailTreatmentTime", { 
-    enableTime: true, 
-    noCalendar: true, 
-    dateFormat: "H:i", 
-    time_24hr: true, 
-    locale: "ar" 
-  });
-  
-  // آلية auto‑save لنموذج بيانات العلاج
-  const treatmentForm = document.getElementById("treatmentForm");
-  if (treatmentForm) {
-    treatmentForm.addEventListener("input", () => {
-      const formData = new FormData(treatmentForm);
-      const data = {};
-      for (let [key, value] of formData.entries()) {
-        data[key] = value;
-      }
-      localStorage.setItem("treatmentFormData", JSON.stringify(data));
-    });
-    
-    const savedData = localStorage.getItem("treatmentFormData");
-    if (savedData) {
-      const data = JSON.parse(savedData);
-      for (let key in data) {
-        if (document.getElementById(key)) {
-          document.getElementById(key).value = data[key];
-        }
-      }
-    }
-  }
-});
-
-/* دالة تسجيل الدخول */
-function login() {
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
-  if (username && password) {
-    console.log("محاولة تسجيل الدخول للمستخدم:", username);
-    window.location.href = "dashboard.html";
-  } else {
-    document.getElementById("message").textContent = "يرجى ملء جميع الحقول";
-  }
 }
 
-/* دوال Toast */
-function showSuccessToast(message) {
-  const toastBody = document.getElementById("successToastBody");
-  if (toastBody) { toastBody.textContent = message; }
-  const toastEl = document.getElementById("successToast");
-  if (toastEl) { new bootstrap.Toast(toastEl).show(); }
-}
-
-function showErrorToast(message) {
-  const toastBody = document.getElementById("errorToastBody");
-  if (toastBody) { toastBody.textContent = message; }
-  const toastEl = document.getElementById("errorToast");
-  if (toastEl) { new bootstrap.Toast(toastEl).show(); }
-}
-
-/* البحث عن حاج */
+// ================================
+// البحث عن حاج
+// ================================
 function searchPilgrim() {
-  const passport = document.getElementById("passport").value;
-  if (!passport.trim()) {
-    document.getElementById("searchMessage").textContent = "يرجى إدخال رقم الجواز للبحث.";
+  const passportEl = document.getElementById("passport");
+  if (!passportEl) return;
+  const passport = passportEl.value.trim();
+  if (!passport) {
+    const msgEl = document.getElementById("searchMessage");
+    if (msgEl) msgEl.textContent = "يرجى إدخال رقم الجواز للبحث.";
     return;
   }
   const searchUrl = `${API_URL}?action=searchPilgrim&passport=${encodeURIComponent(passport)}`;
-  console.log("Search URL:", searchUrl);
-  fetch(searchUrl, { method: "GET" })
+  fetch(searchUrl)
     .then(response => response.json())
     .then(data => {
       const pilgrimCard = document.getElementById("pilgrimCard");
       const pilgrimInfo = document.getElementById("pilgrimInfo");
       if (data.length > 0) {
-        pilgrimCard.classList.remove("d-none");
-        const p = data[0];
-        pilgrimInfo.innerHTML = `
-          <table class="table table-bordered mb-0 text-center fade-in" style="font-size: 1.1rem;">
-            <tbody>
-              <tr><th>المنشأة</th><td>${p["المنشأة"]}</td></tr>
-              <tr><th>الفندق</th><td>${p["الفندق"]}</td></tr>
-              <tr><th>اسم الحاج</th><td>${p["اسم الحاج"]}</td></tr>
-              <tr><th>رقم الجواز</th><td>${p["رقم الجواز"]}</td></tr>
-              <tr><th>الجنس</th><td>${p["الجنس"]}</td></tr>
-              <tr><th>العمر</th><td>${p["العمر"]}</td></tr>
-              <tr><th>المرض المزمن</th><td>${p["المرض المزمن"]}</td></tr>
-              <tr><th>اسم العلاج المستخدم</th><td>${p["اسم العلاج المستخدم"]}</td></tr>
-            </tbody>
-          </table>
-        `;
-        document.getElementById("hiddenPassport").value = p["رقم الجواز"];
-        checkReportStatus(p["رقم الجواز"]);
-        document.getElementById("searchMessage").textContent = "";
+        if (pilgrimCard) pilgrimCard.classList.remove("d-none");
+        if (pilgrimInfo) {
+          const p = data[0];
+          pilgrimInfo.innerHTML = `
+            <table class="table table-bordered mb-0 text-center fade-in">
+              <tbody>
+                <tr><th>المنشأة</th><td>${p["المنشأة"]}</td></tr>
+                <tr><th>الفندق</th><td>${p["الفندق"]}</td></tr>
+                <tr><th>اسم الحاج</th><td>${p["اسم الحاج"]}</td></tr>
+                <tr><th>رقم الجواز</th><td>${p["رقم الجواز"]}</td></tr>
+                <tr><th>الجنس</th><td>${p["الجنس"]}</td></tr>
+                <tr><th>العمر</th><td>${p["العمر"]}</td></tr>
+                <tr><th>المرض المزمن</th><td>${p["المرض المزمن"]}</td></tr>
+                <tr><th>اسم العلاج المستخدم</th><td>${p["اسم العلاج المستخدم"]}</td></tr>
+              </tbody>
+            </table>
+          `;
+          const hiddenPassport = document.getElementById("hiddenPassport");
+          if (hiddenPassport) hiddenPassport.value = p["رقم الجواز"];
+        }
+        checkReportStatus(passport);
+        const msgEl = document.getElementById("searchMessage");
+        if (msgEl) msgEl.textContent = "";
       } else {
-        document.getElementById("searchMessage").textContent = "لم يتم العثور على الحاج بهذا الرقم.";
-        document.getElementById("pilgrimCard").classList.add("d-none");
+        const msgEl = document.getElementById("searchMessage");
+        if (msgEl) msgEl.textContent = "لم يتم العثور على الحاج بهذا الرقم.";
+        if (pilgrimCard) pilgrimCard.classList.add("d-none");
       }
     })
     .catch(error => {
@@ -146,52 +76,99 @@ function searchPilgrim() {
     });
 }
 
-/* التحقق من وجود تقرير */
+// ================================
+// التحقق من وجود تقرير (يمكنك التعديل حسب الحاجة)
+// ================================
 function checkReportStatus(passport) {
   const reportUrl = `${API_URL}?action=getReport&passport=${encodeURIComponent(passport)}`;
-  fetch(reportUrl, { method: "GET" })
+  fetch(reportUrl)
     .then(response => response.json())
     .then(data => {
-      const reportBtn = document.getElementById("viewReportBtn");
-      if (data && data.length > 0) {
-        reportBtn.innerHTML = `تقرير <span class="badge bg-success" style="font-size:0.8rem; margin-right:5px;">✔</span>`;
-      } else {
-        reportBtn.innerHTML = "تقرير";
-      }
+      console.log("حالة التقرير:", data);
     })
     .catch(error => {
       console.error("خطأ أثناء التحقق من التقرير:", error);
     });
 }
 
-/* فتح نافذة إضافة بيانات علاجية */
+// ================================
+// فتح نافذة إضافة بيانات علاجية وضبط التاريخ والوقت تلقائيًا
+// ================================
 function openModal() {
-  new bootstrap.Modal(document.getElementById('addDataModal')).show();
+  const modalEl = document.getElementById("addDataModal");
+  if (modalEl) {
+    const now = new Date();
+    const dateInput = document.getElementById("treatmentDate");
+    const timeInput = document.getElementById("treatmentTime");
+    if (dateInput) {
+      dateInput.value = now.toISOString().slice(0, 10);
+    }
+    if (timeInput) {
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      timeInput.value = `${hours}:${minutes}`;
+    }
+    handleExternalTransferChange();
+    new bootstrap.Modal(modalEl).show();
+  }
 }
 
-/* حفظ البيانات العلاجية */
-function saveTreatmentData() {
-  const passport = document.getElementById("hiddenPassport").value;
-  const doctorName = document.getElementById("doctorName").value;
-  const hotel = document.getElementById("hotel").value;
-  const treatmentDate = document.getElementById("treatmentDate").value;
-  const treatmentTime = document.getElementById("treatmentTime").value;
-  const conservatory = document.getElementById("conservatory").value;
-  const maritalStatus = document.getElementById("maritalStatus").value;
-  const diseaseType = document.getElementById("diseaseType").value;
-  const diagnosis = document.getElementById("diagnosis").value;
-  const prescription = document.getElementById("prescription").value;
-  const treatmentDispensing = document.getElementById("treatmentDispensing").value;
-  const additionalNotes = document.getElementById("additionalNotes").value;
+// ================================
+// إظهار/إخفاء حقول التحويل الخارجي
+// ================================
+function handleExternalTransferChange() {
+  const externalTransfer = document.getElementById("externalTransfer");
+  const hospitalFields = document.getElementById("hospitalFields");
+  if (!externalTransfer || !hospitalFields) return;
+  if (externalTransfer.value === "نعم") {
+    hospitalFields.style.display = "block";
+    const now = new Date();
+    const dateValue = now.toISOString().slice(0, 10);
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById("externalTransferDate").value = dateValue;
+    document.getElementById("externalTransferTime").value = `${hours}:${minutes}`;
+  } else {
+    hospitalFields.style.display = "none";
+    document.getElementById("hospitalName").value = "";
+    document.getElementById("externalTransferDate").value = "";
+    document.getElementById("externalTransferTime").value = "";
+    document.getElementById("diseaseStatus").value = "";
+  }
+}
 
-  if (!passport || !doctorName || !hotel || !treatmentDate || !treatmentTime ||
+// ================================
+// حفظ البيانات العلاجية
+// ================================
+function saveTreatmentData() {
+  const hiddenPassportEl = document.getElementById("hiddenPassport");
+  if (!hiddenPassportEl) return;
+  const passport = hiddenPassportEl.value;
+  const doctorName = document.getElementById("doctorName")?.value || "";
+  const treatmentHotel = document.getElementById("treatmentHotel")?.value || "";
+  const treatmentDate = document.getElementById("treatmentDate")?.value || "";
+  const treatmentTime = document.getElementById("treatmentTime")?.value || "";
+  const conservatory = document.getElementById("conservatory")?.value || "";
+  const maritalStatus = document.getElementById("maritalStatus")?.value || "";
+  const diseaseType = document.getElementById("diseaseType")?.value || "";
+  const diagnosis = document.getElementById("diagnosis")?.value || "";
+  const prescription = document.getElementById("prescription")?.value || "";
+  const treatmentDispensing = document.getElementById("treatmentDispensing")?.value || "";
+  const externalTransfer = document.getElementById("externalTransfer")?.value || "";
+  const hospitalName = document.getElementById("hospitalName")?.value || "";
+  const externalTransferDate = document.getElementById("externalTransferDate")?.value || "";
+  const externalTransferTime = document.getElementById("externalTransferTime")?.value || "";
+  const dStatus = document.getElementById("diseaseStatus")?.value || "";
+  const additionalNotes = document.getElementById("additionalNotes")?.value || "";
+  
+  if (!passport || !doctorName || !treatmentHotel || !treatmentDate || !treatmentTime ||
       !conservatory || !maritalStatus || !diseaseType || !diagnosis || !prescription || !treatmentDispensing) {
     showErrorToast("يرجى ملء جميع الحقول المطلوبة.");
     return;
   }
-
+  
   const searchUrl = `${API_URL}?action=searchPilgrim&passport=${encodeURIComponent(passport)}`;
-  fetch(searchUrl, { method: "GET" })
+  fetch(searchUrl)
     .then(response => response.json())
     .then(result => {
       if (result.length > 0) {
@@ -199,7 +176,7 @@ function saveTreatmentData() {
         formData.append("action", "updatePilgrim");
         formData.append("passport", passport);
         formData.append("doctorName", doctorName);
-        formData.append("hotel", hotel);
+        formData.append("treatmentHotel", treatmentHotel);
         formData.append("treatmentDate", treatmentDate);
         formData.append("treatmentTime", treatmentTime);
         formData.append("conservatory", conservatory);
@@ -208,14 +185,20 @@ function saveTreatmentData() {
         formData.append("diagnosis", diagnosis);
         formData.append("prescription", prescription);
         formData.append("treatmentDispensing", treatmentDispensing);
+        formData.append("externalTransfer", externalTransfer);
+        formData.append("hospitalName", hospitalName);
+        formData.append("externalTransferDate", externalTransferDate);
+        formData.append("externalTransferTime", externalTransferTime);
+        formData.append("diseaseStatus", dStatus);
         formData.append("additionalNotes", additionalNotes);
-
+        
         const updateUrl = `${API_URL}?${formData.toString()}`;
-        fetch(updateUrl, { method: "GET" })
+        fetch(updateUrl)
           .then(response => response.json())
           .then(data => {
-            showSuccessToast(data.message);
-            new bootstrap.Modal(document.getElementById('addDataModal')).hide();
+            showSuccessToast(data.message || "تم حفظ البيانات بنجاح.");
+            const modalEl = document.getElementById("addDataModal");
+            if (modalEl) new bootstrap.Modal(modalEl).hide();
             checkReportStatus(passport);
             localStorage.removeItem("treatmentFormData");
           })
@@ -224,7 +207,7 @@ function saveTreatmentData() {
             showErrorToast("حدث خطأ أثناء تحديث البيانات.");
           });
       } else {
-        showErrorToast("لم يتم العثور على بيانات الحاج!");
+        showErrorToast("لم يتم العثور على الحاج!");
       }
     })
     .catch(error => {
@@ -233,214 +216,298 @@ function saveTreatmentData() {
     });
 }
 
-/* عرض تقرير الحاج */
-function viewReport() {
-  const passport = document.getElementById("hiddenPassport").value.trim();
-  const reportUrl = `${API_URL}?action=getReport&passport=${encodeURIComponent(passport)}`;
-  fetch(reportUrl, { method: "GET" })
+// ================================
+// دالة تصدير التقرير إلى PDF باستخدام html2pdf مع حل DataTables الاحترافي
+// ================================
+function exportReportPDF(elementId, tableSelector) {
+  const element = document.getElementById(elementId);
+  if (!element) {
+    showErrorToast("لا توجد بيانات لتصديرها إلى PDF.");
+    return;
+  }
+  let dtInstance = null;
+  if (tableSelector) {
+    dtInstance = $(tableSelector).DataTable();
+    dtInstance.destroy();
+  }
+  // إزالة تأثير الـ table-responsive مؤقتًا
+  element.classList.remove("table-responsive");
+  element.style.overflow = "visible";
+  element.style.width = "auto";
+  
+  html2pdf().set({
+    margin: 5,
+    filename: 'report.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, windowWidth: 2000 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+  }).from(element).save().then(() => {
+    // إعادة تفعيل الـ table-responsive
+    element.classList.add("table-responsive");
+    element.style.overflow = "";
+    element.style.width = "";
+    if (tableSelector) {
+      $(tableSelector).DataTable({
+        paging: true,
+        searching: true,
+        autoWidth: true,
+        responsive: true
+      });
+    }
+  });
+}
+
+// ================================
+// دوال تقارير DataTables والتقارير المختلفة
+// ================================
+function fetchTransferredReport() {
+  const filterInstitution = document.getElementById("filterInstitutionTransferred").value.trim();
+  const filterHotel = document.getElementById("filterHotelTransferred").value.trim();
+  const params = new URLSearchParams();
+  params.append("action", "getTransferredReport");
+  if (filterInstitution) params.append("filterInstitution", filterInstitution);
+  if (filterHotel) params.append("filterHotel", filterHotel);
+  
+  const url = `${API_URL}?${params.toString()}`;
+  fetch(url)
     .then(response => response.json())
     .then(data => {
-      if (data && data.length > 0) {
-        let reportContent = `
-          <!DOCTYPE html>
-          <html lang="ar" dir="rtl">
-          <head>
-            <meta charset="UTF-8">
-            <title>تقرير الحاج</title>
-            <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-            <style>
-              body { font-family: 'Cairo', sans-serif; margin:0; padding:20px; background-color:#f9f9f9; text-align:right; }
-              h1 { text-align:center; margin-bottom:20px; color:#333; }
-              .report-container { background:#fff; border-radius:8px; border:1px solid #ccc; padding:20px; max-width:600px; margin:0 auto; box-shadow:0 3px 10px rgba(0,0,0,0.15); }
-              table { width:100%; border-collapse:collapse; }
-              th, td { padding:10px; border-bottom:1px solid #ddd; vertical-align:top; }
-              th { background-color:#f2f2f2; width:40%; color:#333; text-align:right; }
-              td { color:#555; text-align:right; }
-              .export-btn { margin: 10px 5px; padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; }
-              .export-pdf { background-color: #d9534f; color: #fff; }
-              .export-excel { background-color: #5cb85c; color: #fff; }
-            </style>
-          </head>
-          <body>
-            <div class="report-container">
-              <h1>تقرير الحاج</h1>
-              <div style="text-align:center; margin-bottom:15px;">
-                <button class="export-btn export-pdf" onclick="window.print()">تصدير PDF</button>
-                <button class="export-btn export-excel" onclick="exportReportExcel()">تصدير Excel</button>
-              </div>
-              <table id="reportTable">
-                <tbody>
-                  <tr><th>المنشأة</th><td>${data[0]["المنشأة"]}</td></tr>
-                  <tr><th>الفندق</th><td>${data[0]["الفندق"]}</td></tr>
-                  <tr><th>اسم الحاج</th><td>${data[0]["اسم الحاج"]}</td></tr>
-                  <tr><th>رقم الجواز</th><td>${data[0]["رقم الجواز"]}</td></tr>
-                  <tr><th>الجنس</th><td>${data[0]["الجنس"]}</td></tr>
-                  <tr><th>العمر</th><td>${data[0]["العمر"]}</td></tr>
-                  <tr><th>المرض المزمن</th><td>${data[0]["المرض المزمن"]}</td></tr>
-                  <tr><th>اسم الطبيب</th><td>${data[0]["اسم الطبيب"] || data[0]["doctorName"]}</td></tr>
-                  <tr><th>تاريخ العلاج</th><td>${data[0]["تاريخ العلاج"] || data[0]["treatmentDate"]}</td></tr>
-                  <tr><th>الوقت</th><td>${data[0]["الوقت"] || data[0]["treatmentTime"]}</td></tr>
-                  <tr><th>المحافظة</th><td>${data[0]["المحافظة"] || data[0]["conservatory"]}</td></tr>
-                  <tr><th>الحالة الاجتماعية</th><td>${data[0]["الحالة الاجتماعية"] || data[0]["maritalStatus"]}</td></tr>
-                  <tr><th>الحالة المرضية</th><td>${data[0]["الحالة المرضية"] || data[0]["diseaseType"]}</td></tr>
-                  <tr><th>التشخيص</th><td>${data[0]["التشخيص"]}</td></tr>
-                  <tr><th>الوصفة الطبية</th><td>${data[0]["الوصفة الطبية"]}</td></tr>
-                  <tr><th>صرف العلاج</th><td>${data[0]["صرف العلاج"] || data[0]["treatmentDispensing"]}</td></tr>
-                  <tr><th>ملاحظات إضافية</th><td>${data[0]["ملاحظات إضافية"] || data[0]["additionalNotes"]}</td></tr>
-                  <tr><th>تقييم الحالة</th><td>${data[0]["تقييم الحالة"]}</td></tr>
-                </tbody>
-              </table>
-            </div>
-            <script>
-              function exportReportExcel() {
-                var table = document.getElementById("reportTable").outerHTML;
-                var dataType = 'application/vnd.ms-excel';
-                var filename = 'report.xls';
-                var downloadLink = document.createElement("a");
-                downloadLink.href = 'data:' + dataType + ', ' + encodeURIComponent(table);
-                downloadLink.download = filename;
-                downloadLink.click();
-              }
-            </script>
-          </body>
-          </html>
-        `;
-        const reportWindow = window.open("", "تقرير الحاج", "width=700,height=800");
-        reportWindow.document.write(reportContent);
-        reportWindow.document.close();
-      } else {
-        showErrorToast("لا يوجد تقرير لهذا الحاج أو لم يتم تشخيصه سابقاً.");
+      const container = document.getElementById("transferredReportContent");
+      if (container) {
+        if (data.length > 0) {
+          container.innerHTML = `<div class="table-responsive" id="transferredTable">` + createTransferredReportTable(data) + `</div>`;
+          $('#transferredTable table').DataTable({
+            paging: true,
+            searching: false,
+            autoWidth: true,
+            responsive: true
+          });
+        } else {
+          container.innerHTML = `<p class="text-danger">لا توجد حالات محولة.</p>`;
+        }
       }
     })
     .catch(error => {
-      console.error("خطأ أثناء جلب التقرير:", error);
-      showErrorToast("حدث خطأ أثناء جلب التقرير.");
+      console.error("خطأ أثناء جلب تقرير الحالات المحولة:", error);
+      showErrorToast("حدث خطأ أثناء جلب تقرير الحالات المحولة.");
     });
 }
 
-/* عرض نافذة التفاصيل */
-function viewDetails() {
-  const passport = document.getElementById("hiddenPassport").value.trim();
-  const detailsUrl = `${API_URL}?action=getPilgrimDetails&passport=${encodeURIComponent(passport)}`;
-  fetch(detailsUrl, { method: "GET" })
+function createTransferredReportTable(data) {
+  let html = `<table class="table table-bordered text-center">
+    <thead>
+      <tr>
+        <th>اسم الحاج</th>
+        <th>رقم الجواز</th>
+        <th>المنشأة</th>
+        <th>الفندق</th>
+        <th>اسم المستشفى</th>
+        <th>حالة المريض</th>
+      </tr>
+    </thead>
+    <tbody>`;
+  data.forEach(item => {
+    html += `<tr>
+      <td>${item["اسم الحاج"] || ""}</td>
+      <td>${item["رقم الجواز"] || ""}</td>
+      <td>${item["المنشأة"] || ""}</td>
+      <td>${item["الفندق"] || ""}</td>
+      <td>${item["اسم المستشفى"] || ""}</td>
+      <td>${item["حالة المريض"] || ""}</td>
+    </tr>`;
+  });
+  html += `</tbody></table>`;
+  return html;
+}
+
+function applyDailyReportFilters() {
+  const filterInstitution = document.getElementById("filterInstitutionDaily")?.value.trim() || "";
+  const filterHotel = document.getElementById("filterHotelDaily")?.value.trim() || "";
+  const filterGender = document.getElementById("filterGenderDaily")?.value.trim() || "";
+  const filterConservatory = document.getElementById("filterConservatoryDaily")?.value.trim() || "";
+  const filterStartDate = document.getElementById("filterStartDateDaily")?.value.trim() || "";
+  const filterEndDate = document.getElementById("filterEndDateDaily")?.value.trim() || "";
+  
+  const params = new URLSearchParams();
+  params.append("action", "getDailyReport");
+  if (filterInstitution) params.append("filterInstitution", filterInstitution);
+  if (filterHotel) params.append("filterHotel", filterHotel);
+  if (filterGender) params.append("filterGender", filterGender);
+  if (filterConservatory) params.append("filterConservatory", filterConservatory);
+  if (filterStartDate) params.append("filterStartDate", filterStartDate);
+  if (filterEndDate) params.append("filterEndDate", filterEndDate);
+  
+  const url = `${API_URL}?${params.toString()}`;
+  fetch(url)
     .then(response => response.json())
     .then(data => {
-      if (data && data.length > 0) {
-        const p = data[0];
-        document.getElementById("detailInstitution").value = p["المنشأة"];
-        document.getElementById("detailHotel").value = p["الفندق"];
-        document.getElementById("detailName").value = p["اسم الحاج"];
-        document.getElementById("detailPassport").value = p["رقم الجواز"];
-        document.getElementById("detailGender").value = p["الجنس"];
-        document.getElementById("detailAge").value = p["العمر"];
-        document.getElementById("detailHealth").value = p["المرض المزمن"];
-        document.getElementById("detailTreatmentName").value = p["اسم الطبيب"] || p["doctorName"];
-        document.getElementById("detailDiagnosis").value = p["التشخيص"];
-        document.getElementById("detailPrescription").value = p["الوصفة الطبية"];
-        document.getElementById("detailNotes").value = p["الملاحظات"];
-        document.getElementById("detailTreatmentDate").value = p["تاريخ العلاج"] || p["treatmentDate"];
-        document.getElementById("detailTreatmentTime").value = p["الوقت"] || p["treatmentTime"];
-        document.getElementById("detailConservatory").value = p["المحافظة"] || p["conservatory"];
-        document.getElementById("detailMaritalStatus").value = p["الحالة الاجتماعية"] || p["maritalStatus"];
-        document.getElementById("detailDiseaseType").value = p["الحالة المرضية"] || p["diseaseType"];
-        document.getElementById("detailTreatmentDispensing").value = p["صرف العلاج"] || p["treatmentDispensing"];
-        new bootstrap.Modal(document.getElementById('detailModal')).show();
-      } else {
-        showErrorToast("لم يتم العثور على تفاصيل الحاج.");
+      const container = document.getElementById("dailyReportContent");
+      if (container) {
+        if (data.length > 0) {
+          let tableHtml = createDailyReportTable(data);
+          container.innerHTML = `<div class="table-responsive" id="dailyTable">` + tableHtml + `</div>`;
+          $('#dailyTable table').DataTable({
+            paging: true,
+            searching: false,
+            autoWidth: true,
+            responsive: true
+          });
+        } else {
+          container.innerHTML = `<p class="text-danger">لا توجد بيانات مطابقة.</p>`;
+        }
       }
     })
     .catch(error => {
-      console.error("خطأ في جلب التفاصيل:", error);
-      showErrorToast("حدث خطأ أثناء جلب التفاصيل.");
+      console.error("خطأ في تقرير الزوار اليومي:", error);
+      showErrorToast("حدث خطأ أثناء جلب تقرير الزوار اليومي.");
     });
 }
 
-/* حفظ التعديلات */
-function editDetails() {
-  const institution = document.getElementById("detailInstitution").value;
-  const hotel = document.getElementById("detailHotel").value;
-  const name = document.getElementById("detailName").value;
-  const passport = document.getElementById("detailPassport").value;
-  const gender = document.getElementById("detailGender").value;
-  const age = document.getElementById("detailAge").value;
-  const health = document.getElementById("detailHealth").value;
-  const treatmentName = document.getElementById("detailTreatmentName").value;
-  const diagnosis = document.getElementById("detailDiagnosis").value;
-  const prescription = document.getElementById("detailPrescription").value;
-  const notes = document.getElementById("detailNotes").value;
-  const treatmentDate = document.getElementById("detailTreatmentDate").value;
-  const treatmentTime = document.getElementById("detailTreatmentTime").value;
-  const conservatory = document.getElementById("detailConservatory").value;
-  const maritalStatus = document.getElementById("detailMaritalStatus").value;
-  const diseaseType = document.getElementById("detailDiseaseType").value;
-  const treatmentDispensing = document.getElementById("detailTreatmentDispensing").value;
-  
-  const formData = new URLSearchParams();
-  formData.append("action", "editPilgrim");
-  formData.append("institution", institution);
-  formData.append("hotel", hotel);
-  formData.append("name", name);
-  formData.append("passport", passport);
-  formData.append("gender", gender);
-  formData.append("age", age);
-  formData.append("health", health);
-  formData.append("treatmentName", treatmentName);
-  formData.append("diagnosis", diagnosis);
-  formData.append("prescription", prescription);
-  formData.append("treatmentNotes", notes);
-  formData.append("treatmentDate", treatmentDate);
-  formData.append("treatmentTime", treatmentTime);
-  formData.append("conservatory", conservatory);
-  formData.append("maritalStatus", maritalStatus);
-  formData.append("diseaseType", diseaseType);
-  formData.append("treatmentDispensing", treatmentDispensing);
-  
-  const updateUrl = `${API_URL}?${formData.toString()}`;
-  fetch(updateUrl, { method: "GET" })
+function createDailyReportTable(data) {
+  let html = `<table class="table table-bordered text-center">
+    <thead>
+      <tr>
+        <th>المنشأة</th>
+        <th>الفندق</th>
+        <th>اسم الحاج</th>
+        <th>الجنس</th>
+        <th>العمر</th>
+        <th>المرض المزمن</th>
+        <th>اسم الطبيب</th>
+        <th>التاريخ</th>
+        <th>المحافظة</th>
+        <th>الحالة الاجتماعية</th>
+        <th>الحالة المرضية</th>
+        <th>تحويل خارجي</th>
+        <th>اسم المستشفى</th>
+        <th>تاريخ التحويل</th>
+        <th>حالة المريض</th>
+      </tr>
+    </thead>
+    <tbody>`;
+  data.forEach(row => {
+    html += `<tr>
+      <td>${row["المنشأة"] || ""}</td>
+      <td>${row["الفندق"] || ""}</td>
+      <td>${row["اسم الحاج"] || ""}</td>
+      <td>${row["الجنس"] || ""}</td>
+      <td>${row["العمر"] || ""}</td>
+      <td>${row["المرض المزمن"] || ""}</td>
+      <td>${row["اسم الطبيب"] || ""}</td>
+      <td>${row["التاريخ"] || ""}</td>
+      <td>${row["المحافظة"] || ""}</td>
+      <td>${row["الحالة الاجتماعية"] || ""}</td>
+      <td>${row["الحالة المرضية"] || ""}</td>
+      <td>${row["تحويل خارجي"] || ""}</td>
+      <td>${row["اسم المستشفى"] || ""}</td>
+      <td>${row["تاريخ التحويل"] || ""}</td>
+      <td>${row["حالة المريض"] || ""}</td>
+    </tr>`;
+  });
+  html += `</tbody></table>`;
+  return html;
+}
+
+function fetchPatientReport() {
+  const patientPassportEl = document.getElementById("patientPassport");
+  if (!patientPassportEl) return;
+  const passport = patientPassportEl.value.trim();
+  if (!passport) {
+    showErrorToast("يرجى إدخال رقم الجواز.");
+    return;
+  }
+  const url = `${API_URL}?action=getPilgrimDetails&passport=${encodeURIComponent(passport)}`;
+  fetch(url)
     .then(response => response.json())
     .then(data => {
-      showSuccessToast(data.message);
-      new bootstrap.Modal(document.getElementById('detailModal')).hide();
-      searchPilgrim();
+      const container = document.getElementById("patientReportContent");
+      if (container) {
+        if (data && data.length > 0) {
+          container.innerHTML = `<div class="table-responsive" id="patientTable">` + createPatientReportTable(data[0]) + `</div>`;
+          $('#patientTable table').DataTable({
+            paging: true,
+            searching: false,
+            autoWidth: true,
+            responsive: true
+          });
+        } else {
+          container.innerHTML = `<p class="text-danger">لا توجد بيانات لهذا الحاج.</p>`;
+        }
+      }
     })
     .catch(error => {
-      console.error("خطأ أثناء تحديث التفاصيل:", error);
-      showErrorToast("حدث خطأ أثناء تحديث التفاصيل.");
+      console.error("خطأ في تقرير الحاج:", error);
+      showErrorToast("حدث خطأ أثناء جلب تقرير الحاج.");
     });
 }
 
-/* حذف سجل الحاج */
-function deleteDetails() {
-  if (!confirm("هل أنت متأكد من حذف بيانات الحاج؟")) return;
-  const passport = document.getElementById("detailPassport").value;
-  const deleteUrl = `${API_URL}?action=deletePilgrim&passport=${encodeURIComponent(passport)}`;
-  fetch(deleteUrl, { method: "GET" })
-    .then(response => response.json())
-    .then(data => {
-      showSuccessToast(data.message);
-      new bootstrap.Modal(document.getElementById('detailModal')).hide();
-      document.getElementById("pilgrimCard").classList.add("d-none");
-    })
-    .catch(error => {
-      console.error("خطأ أثناء حذف السجل:", error);
-      showErrorToast("حدث خطأ أثناء حذف السجل.");
-    });
+function createPatientReportTable(row) {
+  const hasExternal = (row["تحويل خارجي"] && row["تحويل خارجي"].trim() === "نعم");
+  let html = `<table class="table table-bordered text-center">
+    <thead>
+      <tr>
+        <th>المنشأة</th>
+        <th>الفندق</th>
+        <th>اسم الحاج</th>
+        <th>رقم الجواز</th>
+        <th>الجنس</th>
+        <th>العمر</th>
+        <th>المرض المزمن</th>
+        <th>اسم العلاج المستخدم</th>
+        <th>اسم الطبيب</th>
+        <th>الفندق (علاج)</th>
+        <th>التاريخ</th>
+        <th>الوقت</th>
+        <th>المحافظة</th>
+        <th>الحالة الاجتماعية</th>
+        <th>الحالة المرضية</th>`;
+  if (hasExternal) {
+    html += `
+        <th>تحويل خارجي</th>
+        <th>اسم المستشفى</th>
+        <th>تاريخ التحويل</th>
+        <th>حالة المريض</th>`;
+  }
+  html += `</tr></thead>
+    <tbody>
+      <tr>
+        <td>${row["المنشأة"] || ""}</td>
+        <td>${row["الفندق"] || ""}</td>
+        <td>${row["اسم الحاج"] || ""}</td>
+        <td>${row["رقم الجواز"] || ""}</td>
+        <td>${row["الجنس"] || ""}</td>
+        <td>${row["العمر"] || ""}</td>
+        <td>${row["المرض المزمن"] || ""}</td>
+        <td>${row["اسم العلاج المستخدم"] || ""}</td>
+        <td>${row["اسم الطبيب"] || ""}</td>
+        <td>${row["الفندق (علاج)"] || ""}</td>
+        <td>${row["التاريخ"] || ""}</td>
+        <td>${row["الوقت"] || ""}</td>
+        <td>${row["المحافظة"] || ""}</td>
+        <td>${row["الحالة الاجتماعية"] || ""}</td>
+        <td>${row["الحالة المرضية"] || ""}</td>`;
+  if (hasExternal) {
+    html += `
+        <td>${row["تحويل خارجي"] || ""}</td>
+        <td>${row["اسم المستشفى"] || ""}</td>
+        <td>${row["تاريخ التحويل"] || ""}</td>
+        <td>${row["حالة المريض"] || ""}</td>`;
+  }
+  html += `</tr>
+    </tbody>
+  </table>`;
+  return html;
 }
 
-/* عرض التقرير اليومي والإحصائي */
-function showDailyReport() {
-  fetch(`${API_URL}?action=dailyReport`, { method: "GET" })
-    .then(response => response.json())
-    .then(data => console.log("بيانات التقرير اليومي:", data))
-    .catch(error => console.error("خطأ:", error));
-}
-
-/* لوحة تحكم إحصائية */
-function loadAnalytics() {
-  fetch(`${API_URL}?action=analyticsReport`, { method: "GET" })
-    .then(response => response.json())
-    .then(data => {
-      console.log("التحليلات:", data);
-    })
-    .catch(error => console.error("خطأ في التحليلات:", error));
-}
+// ================================
+// ربط الدوال في النافذة
+// ================================
+window.searchPilgrim = searchPilgrim;
+window.openModal = openModal;
+window.saveTreatmentData = saveTreatmentData;
+window.handleExternalTransferChange = handleExternalTransferChange;
+window.fetchTransferredReport = fetchTransferredReport;
+window.applyDailyReportFilters = applyDailyReportFilters;
+window.fetchPatientReport = fetchPatientReport;
+window.viewReport = viewReport;
+window.exportReportPDF = exportReportPDF;
