@@ -69,18 +69,22 @@ body, html {
 /* الجداول */
 .table {
   width: 100%;
+  margin: 0 auto;
 }
 
 .table-responsive {
   margin-top: 15px;
+  max-height: 500px;
+  overflow: auto;
 }
 
 .table th,
 .table td {
   white-space: nowrap;
   text-overflow: ellipsis;
-  min-width: 90px;
+  min-width: 70px;
   vertical-align: middle;
+  text-align: center;
 }
 
 .message {
@@ -127,7 +131,6 @@ body, html {
   color: #333;
 }
 
-/* زر تصدير PDF */
 .btn-pdf {
   background-color: #b71c1c;
   color: #fff;
