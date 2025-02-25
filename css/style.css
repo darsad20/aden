@@ -59,6 +59,7 @@ body, html {
   text-align: center;
 }
 
+/* عنوان الكارت */
 .card-title {
   font-size: 1.4rem;
   color: #212529;
@@ -70,6 +71,12 @@ body, html {
 .table {
   width: 100%;
   margin: 0 auto;
+}
+
+/* هذه الفئة تجعل الجدول يبدأ فعليًا من اليمين */
+.rtl-table {
+  direction: rtl;
+  unicode-bidi: bidi-override;
 }
 
 .table-responsive {
@@ -141,6 +148,14 @@ body, html {
   color: #fff;
 }
 
+.btn-success {
+  font-weight: 600;
+}
+.btn-success:hover {
+  transform: scale(1.01);
+}
+
+/* حاوية التنبيه المخصص */
 .custom-toast {
   border-radius: 5px;
   font-weight: 600;
@@ -163,8 +178,28 @@ select.form-control {
   font-weight: 700;
 }
 
+/* تنسيق التبويبات */
+.nav-tabs .nav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem; /* مسافة بسيطة بين النص والأيقونة */
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.nav-tabs .nav-link i {
+  font-size: 1rem;
+}
+
+/* التبويب النشط */
 .nav-tabs .nav-link.active {
   background-color: var(--primary-color);
   color: #fff !important;
   border: none;
+}
+
+/* تباعد بسيط في البطاقات الداخلية للتقارير */
+.card-body {
+  padding: 1.5rem;
 }

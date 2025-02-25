@@ -1,7 +1,7 @@
 "use strict";
 
 // تحديث رابط النشر إلى الرابط الجديد
-const API_URL = "https://script.google.com/macros/s/AKfycbyec3sPqMppRXYqDIQsPUVRA9etpjJvSl0GM13v1bc2niLceZ5LYmj5dvB06c8uJ_hR/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxWiJik7tzl-A1HTwDu_wTz4PcyO0nB0fblzOMMBDFSu5MmVtd_lUBgL0c1yT2tzMeO/exec";
 
 // دوال مساعدة لعرض رسائل الخطأ/النجاح باستخدام SweetAlert2
 function showErrorToast(msg) {
@@ -22,17 +22,43 @@ function showSuccessToast(msg) {
   });
 }
 
+// دوال تنسيق التاريخ والوقت
+function formatDate(isoString) {
+  if (!isoString) return "";
+  var d = new Date(isoString);
+  if (isNaN(d.getTime())) return isoString;
+  return d.toLocaleDateString("ar-EG");
+}
+
+function formatTime(isoString) {
+  if (!isoString) return "";
+  var d = new Date(isoString);
+  if (isNaN(d.getTime())) return isoString;
+  return d.toLocaleTimeString("ar-EG", { hour: '2-digit', minute: '2-digit' });
+}
+
 // ================================
-// البحث عن حاج (عرض البيانات الأساسية: الأعمدة A–H)
+// البحث عن حاج (يمكن البحث برقم الجواز أو باسم الحاج)
 // ================================
 function searchPilgrim() {
-  var passport = document.getElementById("passport").value.trim();
-  if (!passport) {
+  var passport = document.getElementById("hiddenPassport").value.trim();
+  var pilgrimName = document.getElementById("pilgrimName") ? document.getElementById("pilgrimName").value.trim() : "";
+  
+  if (!passport && !pilgrimName) {
     var msgEl = document.getElementById("searchMessage");
-    if (msgEl) msgEl.textContent = "يرجى إدخال رقم الجواز للبحث.";
+    if (msgEl) msgEl.textContent = "يرجى إدخال رقم الجواز أو اسم الحاج للبحث.";
     return;
   }
-  var searchUrl = `${API_URL}?action=searchPilgrim&passport=${encodeURIComponent(passport)}`;
+  
+  var searchUrl = "";
+  // إذا تم إدخال رقم الجواز نعطيه الأولوية
+  if (passport) {
+    searchUrl = `${API_URL}?action=searchPilgrim&passport=${encodeURIComponent(passport)}`;
+  } else {
+    // إذا كان رقم الجواز فارغًا، نبحث بالاسم باستخدام إجراء searchByName
+    searchUrl = `${API_URL}?action=searchByName&pilgrimName=${encodeURIComponent(pilgrimName)}`;
+  }
+  
   fetch(searchUrl)
     .then(response => response.json())
     .then(data => {
@@ -40,28 +66,32 @@ function searchPilgrim() {
       var pilgrimInfo = document.getElementById("pilgrimInfo");
       if (data.length > 0) {
         if (pilgrimCard) pilgrimCard.classList.remove("d-none");
-        if (pilgrimInfo) {
-          var p = data[0];
-          pilgrimInfo.innerHTML = `
-            <table class="table table-bordered mb-0 text-center fade-in">
-              <tbody>
-                <tr><th>المنشأة</th><td>${p["المنشأة"]}</td></tr>
-                <tr><th>الفندق</th><td>${p["الفندق"]}</td></tr>
-                <tr><th>اسم الحاج</th><td>${p["اسم الحاج"]}</td></tr>
-                <tr><th>رقم الجواز</th><td>${p["رقم الجواز"]}</td></tr>
-                <tr><th>الجنس</th><td>${p["الجنس"]}</td></tr>
-                <tr><th>العمر</th><td>${p["العمر"]}</td></tr>
-                <tr><th>المرض المزمن</th><td>${p["المرض المزمن"]}</td></tr>
-                <tr><th>اسم العلاج المستخدم</th><td>${p["اسم العلاج المستخدم"]}</td></tr>
-              </tbody>
-            </table>
-          `;
-          var hiddenPassport = document.getElementById("hiddenPassport");
-          if (hiddenPassport) hiddenPassport.value = p["رقم الجواز"];
-        }
+       if (pilgrimInfo) {
+  var p = data[0];
+  pilgrimInfo.innerHTML = `
+    <table class="table table-bordered mb-0 text-center fade-in">
+      <tbody>
+        <tr><th>المنشأة</th><td>${p["المنشأة"]}</td></tr>
+        <tr><th>الفندق</th><td>${p["الفندق"]}</td></tr>
+        <tr><th>اسم الحاج</th><td>${p["اسم الحاج"]}</td></tr>
+        <tr><th>رقم الجواز</th><td>${p["رقم الجواز"]}</td></tr>
+        <tr><th>الجنس</th><td>${p["الجنس"]}</td></tr>
+        <tr><th>العمر</th><td>${p["العمر"]}</td></tr>
+        <tr><th>المرض المزمن</th><td>${p["المرض المزمن"]}</td></tr>
+        <tr><th>اسم العلاج المستخدم</th><td>${p["اسم العلاج المستخدم"]}</td></tr>
+      </tbody>
+    </table>
+  `;
+  var hiddenPassport = document.getElementById("hiddenPassport");
+  if (hiddenPassport && p["رقم الجواز"]) {
+    hiddenPassport.value = p["رقم الجواز"];
+    console.log("تم تحديث hiddenPassport: ", hiddenPassport.value);
+  }
+}
+
       } else {
         var msgEl = document.getElementById("searchMessage");
-        if (msgEl) msgEl.textContent = "لم يتم العثور على الحاج بهذا الرقم.";
+        if (msgEl) msgEl.textContent = "لم يتم العثور على نتائج مطابقة.";
         if (pilgrimCard) pilgrimCard.classList.add("d-none");
       }
     })
@@ -122,7 +152,7 @@ function handleExternalTransferChange() {
 function saveTreatmentData() {
   var hiddenPassportEl = document.getElementById("hiddenPassport");
   if (!hiddenPassportEl) return;
-  var passport = hiddenPassportEl.value;
+  var passport = hiddenPassportEl.value;  // نستخدم الحقل المخفي
   var doctorName = (document.getElementById("doctorName") || {}).value || "";
   var treatmentHotel = (document.getElementById("treatmentHotel") || {}).value || "";
   var treatmentDate = (document.getElementById("treatmentDate") || {}).value || "";
@@ -218,7 +248,7 @@ function openDeathModal() {
 // حفظ بيانات الوفاة
 // ================================
 function saveDeathData() {
-  var passport = (document.getElementById("passport") || {}).value;
+  var passport = (document.getElementById("hiddenPassport") || {}).value.trim();
   var deathCause = (document.getElementById("deathCause") || {}).value || "";
   var deathHospital = (document.getElementById("deathHospital") || {}).value || "";
   var burialPlace = (document.getElementById("burialPlace") || {}).value || "";
@@ -255,22 +285,101 @@ function saveDeathData() {
 }
 
 // ================================
+// دوال تصدير Excel باستخدام ExcelJS
+// ================================
+function exportToExcel(data, columns, fileName = "Report.xlsx") {
+  const workbook = new ExcelJS.Workbook();
+  workbook.creator = 'YourApp';
+  workbook.created = new Date();
+  workbook.modified = new Date();
+  
+  // إنشاء ورقة عمل جديدة مع تعيين اتجاهها من اليمين إلى اليسار
+  const worksheet = workbook.addWorksheet('Report', { properties: { rightToLeft: true } });
+  worksheet.views = [{ rightToLeft: true }];
+  
+  // إنشاء نسخة معكوسة من الأعمدة وتعيين محاذاة اليمين لكل عمود
+  const reversedColumns = columns.slice().reverse().map(col => ({
+    header: col.header,
+    key: col.key,
+    width: col.width,
+    style: { alignment: { horizontal: 'right' } }
+  }));
+  worksheet.columns = reversedColumns;
+  
+  // إضافة الصفوف وفق ترتيب الأعمدة المقلوب وتعيين محاذاة الخلايا
+  data.forEach(row => {
+    const rowArray = reversedColumns.map(col => row[col.key]);
+    const newRow = worksheet.addRow(rowArray);
+    newRow.eachCell({ includeEmpty: true }, function(cell) {
+      cell.alignment = { horizontal: 'right' };
+    });
+  });
+  
+  workbook.xlsx.writeBuffer().then(function(buffer) {
+    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  });
+}
+
+// دالة تصدير Excel عامة تعتمد على استخراج البيانات من جدول HTML
+function exportReportExcel(elementId, tableSelector) {
+  var table = document.querySelector(tableSelector);
+  if (!table) {
+    showErrorToast("لا توجد بيانات لتصديرها.");
+    return;
+  }
+  // استخراج رؤوس الأعمدة
+  var headers = [];
+  var headerCells = table.querySelectorAll("thead tr th");
+  headerCells.forEach(function(th) {
+    headers.push(th.textContent.trim());
+  });
+  
+  // استخراج البيانات من الصفوف
+  var data = [];
+  var rows = table.querySelectorAll("tbody tr");
+  rows.forEach(function(tr) {
+    var rowData = {};
+    var cells = tr.querySelectorAll("td");
+    cells.forEach(function(td, i) {
+      rowData[headers[i]] = td.textContent.trim();
+    });
+    data.push(rowData);
+  });
+  
+  // إعداد الأعمدة بناءً على رؤوس الأعمدة
+  var columns = headers.map(function(header) {
+    return { header: header, key: header, width: 20 };
+  });
+  
+  exportToExcel(data, columns, "Report.xlsx");
+}
+
+// دالة خاصة لتصدير عدد الزوار اليومي
+function exportDailyExcel() {
+  exportReportExcel('dailyReportContent', '#dailyTable table');
+}
+
+// ================================
 // تقارير النظام
 // ================================
 
-// تقرير الحالات المحولة (عرض كل الحالات المحولة دون بحث)
+// تقرير الحالات المحولة
 function fetchTransferredReport() {
   var requestUrl = `${API_URL}?action=getTransferredCases`;
   fetch(requestUrl)
     .then(response => response.json())
     .then(data => {
-      // فرز النتائج (اختياري) مثلاً حسب تاريخ التحويل
-      data.sort(function(a, b) {
-        return new Date(a["تاريخ التحويل"]) - new Date(b["تاريخ التحويل"]);
-      });
+      data.sort((a, b) => new Date(a["تاريخ التحويل"]) - new Date(b["تاريخ التحويل"]));
       var reportDiv = document.getElementById("transferredReportContent");
       if (data.length > 0) {
-        var html = "<div class='table-responsive' id='transferredTable'><table class='table table-bordered text-center'><thead><tr>" +
+        var html = "<div class='table-responsive' id='transferredTable'><table class='table table-bordered text-center rtl-table'><thead><tr>" +
                      "<th>المنشأة</th>" +
                      "<th>الفندق</th>" +
                      "<th>اسم الحاج</th>" +
@@ -285,7 +394,7 @@ function fetchTransferredReport() {
                      "<th>وقت التحويل</th>" +
                      "<th>حالة المريض</th>" +
                    "</tr></thead><tbody>";
-        data.forEach(function(item) {
+        data.forEach(item => {
           html += "<tr>" +
                     `<td>${item["المنشأة"] || ""}</td>` +
                     `<td>${item["الفندق"] || ""}</td>` +
@@ -297,13 +406,21 @@ function fetchTransferredReport() {
                     `<td>${item["الحالة المرضية"] || ""}</td>` +
                     `<td>${item["التشخيص"] || ""}</td>` +
                     `<td>${item["اسم المستشفى"] || ""}</td>` +
-                    `<td>${item["تاريخ التحويل"] || ""}</td>` +
-                    `<td>${item["وقت التحويل"] || ""}</td>` +
+                    `<td>${item["تاريخ التحويل"] ? formatDate(item["تاريخ التحويل"]) : ""}</td>` +
+                    `<td>${item["وقت التحويل"] ? formatTime(item["وقت التحويل"]) : ""}</td>` +
                     `<td>${item["حالة المريض"] || ""}</td>` +
                   "</tr>";
         });
         html += "</tbody></table></div>";
         reportDiv.innerHTML = html;
+        setTimeout(() => {
+          $('#transferredTable table').DataTable({
+            paging: true,
+            searching: true,
+            ordering: true,
+            language: { url: "https://cdn.datatables.net/plug-ins/1.13.4/i18n/ar.json" }
+          });
+        }, 0);
       } else {
         reportDiv.innerHTML = "لا توجد بيانات حالات محولة متوفرة.";
       }
@@ -315,22 +432,18 @@ function fetchTransferredReport() {
     });
 }
 
-// تقرير عدد الزوار اليومي (عرض البيانات الأساسية + بيانات علاجية)
+// تقرير عدد الزوار اليومي
 function fetchDailyVisitors() {
   var requestUrl = `${API_URL}?action=getDailyVisitors`;
   fetch(requestUrl)
     .then(response => response.json())
     .then(data => {
-      // يمكن فرز النتائج حسب تاريخ العلاج
-      data.sort(function(a, b) {
-        return new Date(a["التاريخ"]) - new Date(b["التاريخ"]);
-      });
+      data.sort((a, b) => new Date(a["التاريخ"]) - new Date(b["التاريخ"]));
       var reportDiv = document.getElementById("dailyReportContent");
       if (data.length > 0) {
-        var html = "<div class='table-responsive' id='dailyTable'><table class='table table-bordered text-center'><thead><tr>" +
+        var html = "<div class='table-responsive' id='dailyTable'><table class='table table-bordered text-center rtl-table'><thead><tr>" +
                      "<th>المنشأة</th>" +
                      "<th>اسم الطبيب</th>" +
-                     "<th>الفندق الأساسي</th>" +
                      "<th>الفندق العلاجي</th>" +
                      "<th>اسم الحاج</th>" +
                      "<th>رقم الجواز</th>" +
@@ -351,7 +464,6 @@ function fetchDailyVisitors() {
           html += "<tr>" +
                     `<td>${item["المنشأة"] || ""}</td>` +
                     `<td>${item["اسم الطبيب"] || ""}</td>` +
-                    `<td>${item["الفندق الأساسي"] || ""}</td>` +
                     `<td>${item["الفندق العلاجي"] || ""}</td>` +
                     `<td>${item["اسم الحاج"] || ""}</td>` +
                     `<td>${item["رقم الجواز"] || ""}</td>` +
@@ -359,8 +471,8 @@ function fetchDailyVisitors() {
                     `<td>${item["العمر"] || ""}</td>` +
                     `<td>${item["المرض المزمن"] || ""}</td>` +
                     `<td>${item["اسم العلاج المستخدم"] || ""}</td>` +
-                    `<td>${item["التاريخ"] || ""}</td>` +
-                    `<td>${item["الوقت"] || ""}</td>` +
+                    `<td>${item["التاريخ"] ? formatDate(item["التاريخ"]) : ""}</td>` +
+                    `<td>${item["الوقت"] ? formatTime(item["الوقت"]) : ""}</td>` +
                     `<td>${item["المحافظة"] || ""}</td>` +
                     `<td>${item["الحالة الاجتماعية"] || ""}</td>` +
                     `<td>${item["الحالة المرضية"] || ""}</td>` +
@@ -371,17 +483,26 @@ function fetchDailyVisitors() {
         });
         html += "</tbody></table></div>";
         reportDiv.innerHTML = html;
+        setTimeout(() => {
+          $('#dailyTable table').DataTable({
+            paging: true,
+            searching: true,
+            ordering: true,
+            language: { url: "https://cdn.datatables.net/plug-ins/1.13.4/i18n/ar.json" }
+          });
+        }, 0);
       } else {
         reportDiv.innerHTML = "لا توجد بيانات متوفرة.";
       }
     })
     .catch(error => {
       console.error("خطأ أثناء جلب عدد الزوار اليومي:", error);
+      var reportDiv = document.getElementById("dailyReportContent");
       reportDiv.innerHTML = "حدث خطأ أثناء جلب البيانات.";
     });
 }
 
-// تقرير الحاج (عند البحث برقم الجواز)
+// تقرير الحاج (تقرير تفصيلي عند البحث برقم الجواز)
 function fetchPatientReport() {
   var passport = document.getElementById("patientPassport").value.trim();
   if (!passport) {
@@ -399,7 +520,7 @@ function fetchPatientReport() {
     .then(data => {
       var reportDiv = document.getElementById("patientReportContent");
       if (data.length > 0) {
-        var html = "<div id='patientTable'><table class='table table-bordered text-center'><thead><tr>" +
+        var html = "<div class='table-responsive' id='patientTable'><table class='table table-bordered text-center rtl-table'><thead><tr>" +
                      "<th>المنشأة</th>" +
                      "<th>الفندق</th>" +
                      "<th>اسم الحاج</th>" +
@@ -423,6 +544,14 @@ function fetchPatientReport() {
         });
         html += "</tbody></table></div>";
         reportDiv.innerHTML = html;
+        setTimeout(() => {
+          $('#patientTable table').DataTable({
+            paging: true,
+            searching: true,
+            ordering: true,
+            language: { url: "https://cdn.datatables.net/plug-ins/1.13.4/i18n/ar.json" }
+          });
+        }, 0);
       } else {
         reportDiv.innerHTML = "لا توجد بيانات متوفرة لهذا الحاج.";
       }
@@ -438,18 +567,16 @@ function fetchPatientReport() {
     });
 }
 
-// تقرير الوفيات (عرض كل الوفيات دون بحث)
+// تقرير الوفيات
 function fetchDeathReport() {
   var requestUrl = `${API_URL}?action=getDeathReport`;
   fetch(requestUrl)
     .then(response => response.json())
     .then(data => {
-      // فرز النتائج حسب تاريخ الوفاة (اختياري)
       data.sort((a, b) => new Date(a["تاريخ الوفاة"]) - new Date(b["تاريخ الوفاة"]));
       var reportDiv = document.getElementById("deathReportContent");
       if (data.length > 0) {
-        // إصلاح التفاف الجدول بـ table-responsive:
-        var html = "<div class='table-responsive' id='deathTable'><table class='table table-bordered text-center'><thead><tr>" +
+        var html = "<div class='table-responsive' id='deathTable'><table class='table table-bordered text-center rtl-table'><thead><tr>" +
                      "<th>المنشأة</th>" +
                      "<th>الفندق</th>" +
                      "<th>اسم الحاج</th>" +
@@ -478,13 +605,21 @@ function fetchDeathReport() {
                     `<td>${item["سبب الوفاة"] || ""}</td>` +
                     `<td>${item["المستشفى"] || ""}</td>` +
                     `<td>${item["مكان الدفن"] || ""}</td>` +
-                    `<td>${item["تاريخ الوفاة"] || ""}</td>` +
-                    `<td>${item["وقت الوفاة"] || ""}</td>` +
+                    `<td>${item["تاريخ الوفاة"] ? formatDate(item["تاريخ الوفاة"]) : ""}</td>` +
+                    `<td>${item["وقت الوفاة"] ? formatTime(item["وقت الوفاة"]) : ""}</td>` +
                     `<td>${item["ملاحظات"] || ""}</td>` +
                   "</tr>";
         });
         html += "</tbody></table></div>";
         reportDiv.innerHTML = html;
+        setTimeout(() => {
+          $('#deathTable table').DataTable({
+            paging: true,
+            searching: true,
+            ordering: true,
+            language: { url: "https://cdn.datatables.net/plug-ins/1.13.4/i18n/ar.json" }
+          });
+        }, 0);
       } else {
         reportDiv.innerHTML = "لا توجد بيانات وفيات متوفرة.";
       }
@@ -529,7 +664,8 @@ function exportReportPDF(elementId, tableSelector) {
         paging: true,
         searching: true,
         autoWidth: true,
-        responsive: true
+        responsive: true,
+        language: { url: "https://cdn.datatables.net/plug-ins/1.13.4/i18n/ar.json" }
       });
     }
   });
@@ -539,25 +675,20 @@ function exportReportPDF(elementId, tableSelector) {
 // استدعاء التقارير تلقائيًا عند تغيير التبويب
 // ================================
 document.addEventListener('DOMContentLoaded', () => {
-  // عند فتح تبويب الحالات المحولة
   let transferredTab = document.getElementById('transferred-tab');
   transferredTab.addEventListener('shown.bs.tab', () => {
     fetchTransferredReport();
   });
 
-  // عند فتح تبويب عدد الزوار اليومي
   let dailyTab = document.getElementById('daily-tab');
   dailyTab.addEventListener('shown.bs.tab', () => {
     fetchDailyVisitors();
   });
 
-  // عند فتح تبويب تقرير الوفيات
   let deathTab = document.getElementById('death-tab');
   deathTab.addEventListener('shown.bs.tab', () => {
     fetchDeathReport();
   });
-
-  // يمكن بدء التبويب الأول (الحالات المحولة) تلقائيًا إذا أردت.
 });
 
 // كشف الدوال للاستخدام في الـ HTML
@@ -569,3 +700,5 @@ window.openDeathModal = openDeathModal;
 window.saveDeathData = saveDeathData;
 window.fetchPatientReport = fetchPatientReport;
 window.exportReportPDF = exportReportPDF;
+window.exportReportExcel = exportReportExcel;
+window.exportDailyExcel = exportDailyExcel;
