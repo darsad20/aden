@@ -8,13 +8,15 @@
   
   <!-- خط Cairo -->
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-  
-  <!-- Bootswatch Litera Theme لـ Bootstrap 5 -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/litera/bootstrap.min.css">
-  
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" referrerpolicy="no-referrer" />
-  
+
+  <!-- Bootswatch Cosmo Theme لـ Bootstrap 5 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/cosmo/bootstrap.min.css">
+
+  <!-- Font Awesome 6.3.0 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css"
+      integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ=="
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+
   <!-- DataTables CSS -->
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
   
@@ -23,16 +25,16 @@
   
   <!-- SweetAlert2 CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-  
-  <!-- Tempus Dominus CSS (للتقويم) -->
+
+  <!-- Tempus Dominus CSS (اختياري) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.2.7/dist/css/tempus-dominus.min.css" />
-  
+
   <!-- ملف التنسيقات المخصص -->
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="bg-body" style="font-family: 'Cairo', sans-serif;">
+<body>
   <!-- رأس الصفحة -->
-  <div class="container text-center py-4 fade-in">
+  <div class="container py-4 text-center fade-in">
     <img src="images/pic.png" alt="شعار الوزارة" class="logo-dashboard" aria-label="شعار الوزارة">
     <h2 class="slogan">الرعاية الصحية للحجاج 1446هـ</h2>
   </div>
@@ -42,93 +44,141 @@
     <div class="row justify-content-center">
       <div class="col-12 col-md-6">
         <!-- بطاقة البحث -->
-        <div class="card custom-card mb-4 shadow-sm" style="max-width: 500px;">
-          <div class="card-body text-center">
-            <h4 class="card-title mb-3 fw-normal text-dark">
-              البحث عن حاج <i class="fa fa-search" style="margin-left:5px;"></i>
+        <div class="card custom-card mb-4 shadow-sm" style="max-width:600px; margin:0 auto;">
+          <div class="card-body">
+            <h4 class="card-title fw-bold text-dark mb-4 text-center fs-3">
+              البحث عن حاج
+              <i class="fa-solid fa-magnifying-glass ms-2 fa-lg"></i>
             </h4>
             <!-- حقل رقم الجواز -->
-            <div class="mb-3">
-              <input type="text" class="form-control form-control-sm text-center" id="passport" placeholder="رقم الجواز">
+            <div class="mb-3 text-center">
+              <label for="passport" class="form-label fw-semibold">رقم الجواز</label>
+              <input type="text" class="form-control form-control-sm" id="passport" placeholder="أدخل رقم الجواز">
             </div>
             <!-- حقل اسم الحاج -->
-            <div class="mb-3">
-              <input type="text" class="form-control form-control-sm text-center" id="pilgrimName" placeholder="اسم الحاج">
+            <div class="mb-4 text-center">
+              <label for="pilgrimName" class="form-label fw-semibold">اسم الحاج</label>
+              <input type="text" class="form-control form-control-sm" id="pilgrimName" placeholder="أدخل اسم الحاج">
             </div>
-            <button class="btn btn-primary" onclick="searchPilgrim()">
-              بحث <i class="fa fa-search" style="margin-left:5px;"></i>
-            </button>
-            <p id="searchMessage" class="message mt-2"></p>
-          </div>
-        </div>
+          <div class="d-flex justify-content-center mb-3">
+  <button 
+    class="btn btn-outline-gold btn-lg fw-bold d-inline-flex align-items-center justify-content-center" 
+    id="searchButton" 
+    style="border: 2px solid #c79b30; color: black; font-size: 1.5rem; padding: 0.5rem 1.5rem;">
+    بحث <i class="fa-solid fa-magnifying-glass ms-2"></i>
+  </button>
+</div>
+<p id="searchMessage" class="message mt-3"></p>
         
-        <!-- زر التقارير أسفل بطاقة البحث -->
-        <div id="reportButtonContainer" class="text-center mb-4">
-          <button class="btn btn-info" id="reportsBtn" data-bs-toggle="modal" data-bs-target="#reportsModal">
-            تقارير <i class="fa fa-chart-bar" style="margin-left:5px;"></i>
-          </button>
-        </div>
+       <div id="reportButtonContainer" class="text-center mb-4">
+  <button 
+    class="btn btn-outline-gold btn-lg fw-bold d-inline-flex align-items-center justify-content-center" 
+    id="reportsBtn" 
+    data-bs-toggle="modal" 
+    data-bs-target="#reportsModal" 
+    title="عرض تقارير النظام"
+    style="border: 2px solid #c79b30; color: black; font-size: 1.5rem; padding: 0.5rem 1.5rem;">
+    تقارير <i class="fa-solid fa-folder-open ms-3"></i>
+  </button>
+</div>
   
         <!-- بطاقة عرض بيانات الحاج -->
-        <div id="pilgrimCard" class="card custom-card d-none shadow-sm" style="max-width: 500px;">
-          <div class="card-header text-center">
+        <div id="pilgrimCard" class="card custom-card d-none shadow-sm text-center mt-3">
+          <div class="card-header">
             <h5 class="mb-0 fw-bold">
-              بيانات الحاج <i class="fa-solid fa-user" style="margin-left:5px;"></i>
+              بيانات الحاج <i class="fa-solid fa-user ms-1"></i>
             </h5>
           </div>
-          <div class="card-body bg-white" id="pilgrimInfo"></div>
-          <div class="card-footer text-center bg-light">
-            <button class="btn btn-medical me-2" id="addDataBtn" onclick="openModal()"> 
-              إضافة بيانات علاجية <i class="fa fa-plus-circle" style="margin-left:5px;"></i>
+          <div class="card-body bg-white" id="pilgrimInfo">
+            <!-- يتم تعبئة بيانات الحاج هنا -->
+          </div>
+          <div class="card-footer bg-light d-flex justify-content-between">
+            <!-- زر إضافة بيانات علاجية -->
+            <button class="btn btn-medical" id="addDataBtn" data-bs-toggle="tooltip" data-bs-placement="top" title="إضافة معلومات علاجية جديدة">
+              إضافة بيانات علاجية <i class="fa-solid fa-circle-plus ms-1"></i>
             </button>
-            <!-- زر بيانات الوفاة منفصل -->
-            <button class="btn btn-danger me-2" id="deathDataBtn" onclick="openDeathModal()">
-              بيانات الوفاة <i class="fa fa-heartbeat" style="margin-left:5px;"></i>
+            <!-- زر بيانات الوفاة -->
+            <button class="btn btn-danger" id="deathDataBtn"
+                    data-bs-toggle="modal" data-bs-target="#deathDataModal"
+                    title="تحديث بيانات الوفاة">
+              إضافة تفاصيل الوفاة <i class="fa-solid fa-heart-pulse ms-1"></i>
             </button>
+            <!-- حقل مخفي لتخزين رقم الجواز المكتشف -->
+            <input type="hidden" id="hiddenPassport" value="">
           </div>
         </div>
       </div>
     </div>
   </div>
   
-  <!-- نافذة إضافة بيانات علاجية -->
-  <div class="modal fade" id="addDataModal" tabindex="-1" aria-labelledby="addDataModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content custom-card">
-        <div class="modal-header">
-          <h5 class="modal-title w-100 text-center" id="addDataModalLabel">
-            إضافة بيانات علاجية <i class="fa fa-plus-circle" style="margin-left:5px;"></i>
-          </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
-        </div>
-        <div class="modal-body">
-          <form id="treatmentForm">
-            <input type="hidden" id="hiddenPassport">
-            <!-- حقول بيانات العلاج -->
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label for="doctorName" class="form-label">اسم الطبيب</label>
-                <input type="text" class="form-control form-control-sm" id="doctorName">
-              </div>
-              <div class="col-md-6">
-                <label for="treatmentHotel" class="form-label">الفندق</label>
-                <input type="text" class="form-control form-control-sm" id="treatmentHotel">
-              </div>
+<!-- نافذة إضافة بيانات علاجية -->
+<div class="modal fade" id="addDataModal" tabindex="-1" aria-labelledby="addDataModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content custom-card shadow-sm">
+      
+      <!-- ترويسة المودال مع زر الإغلاق على اليسار والعنوان في المنتصف -->
+      <div class="modal-header d-flex align-items-center justify-content-center position-relative">
+        <!-- زر الإغلاق في أقصى اليسار -->
+        <button type="button" 
+                class="btn-close position-absolute start-0 ms-2" 
+                data-bs-dismiss="modal" 
+                aria-label="إغلاق">
+        </button>
+        <!-- العنوان في المنتصف مع الأيقونة على يساره (بالنسبة للغة RTL) -->
+        <h5 class="modal-title fw-bold m-0" id="addDataModalLabel">
+          إضافة بيانات علاجية <i class="fa-solid fa-circle-plus ms-1"></i>
+        </h5>
+      </div>
+      
+      <div class="modal-body text-center" style="padding: 1.5rem 2rem;">
+        <form id="treatmentForm">
+          <input type="hidden" id="hiddenPassport">
+          
+          <!-- بيانات الطبيب والفندق -->
+          <h6 class="section-title mb-2">
+            بيانات الطبيب والفندق <i class="fa-solid fa-user-md ms-1"></i>
+          </h6>
+          <hr class="soft-hr">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="doctorName" class="form-label fw-bold text-center w-100 mb-1">
+                اسم الطبيب <span style="color:red">*</span>
+              </label>
+              <input type="text" class="form-control form-control-sm text-center" id="doctorName" placeholder="أدخل اسم الطبيب" required>
             </div>
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label for="treatmentDate" class="form-label">التاريخ</label>
-                <input type="date" class="form-control form-control-sm" id="treatmentDate">
-              </div>
-              <div class="col-md-6">
-                <label for="treatmentTime" class="form-label">الوقت</label>
-                <input type="time" class="form-control form-control-sm" id="treatmentTime">
-              </div>
+            <div class="col-md-6">
+              <label for="treatmentHotel" class="form-label fw-bold text-center w-100 mb-1">
+                الفندق 
+              </label>
+              <input type="text" class="form-control form-control-sm text-center" id="treatmentHotel" placeholder="اسم الفندق">
             </div>
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label for="conservatory" class="form-label">المحافظة</label>
-                <select id="conservatory" class="form-control form-control-sm">
+          </div>
+          
+          <!-- التاريخ والوقت -->
+          <h6 class="section-title mt-4 mb-2">
+            التاريخ والوقت <i class="fa-solid fa-calendar-days ms-1"></i>
+          </h6>
+          <hr class="soft-hr">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="treatmentDate" class="form-label fw-bold mb-1">التاريخ</label>
+              <input type="date" class="form-control form-control-sm text-center" id="treatmentDate">
+            </div>
+            <div class="col-md-6">
+              <label for="treatmentTime" class="form-label fw-bold mb-1">الوقت</label>
+              <input type="time" class="form-control form-control-sm text-center" id="treatmentTime">
+            </div>
+          </div>
+          
+          <!-- المعلومات الشخصية -->
+          <h6 class="section-title mt-4 mb-2">
+            المعلومات الشخصية <i class="fa-solid fa-address-card ms-1"></i>
+          </h6>
+          <hr class="soft-hr">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="conservatory" class="form-label fw-bold mb-1">المحافظة</label>
+              <select id="conservatory" class="form-control form-control-sm text-center">
                   <option value="">اختر المحافظة</option>
                   <option value="صنعاء">صنعاء</option>
                   <option value="عمران">عمران</option>
@@ -154,21 +204,27 @@
                 </select>
               </div>
               <div class="col-md-6">
-                <label for="maritalStatus" class="form-label">الحالة الاجتماعية</label>
-                <select id="maritalStatus" class="form-control form-control-sm">
-                  <option value="">اختر الحالة الاجتماعية</option>
-                  <option value="عازب">عازب</option>
-                  <option value="متزوج">متزوج</option>
-                  <option value="مطلق">مطلق</option>
-                  <option value="أرمل">أرمل</option>
-                </select>
-              </div>
+              <label for="maritalStatus" class="form-label fw-bold mb-1">الحالة الاجتماعية</label>
+              <select id="maritalStatus" class="form-control form-control-sm text-center">
+                <option value="">اختر الحالة</option>
+                <option value="عازب">عازب</option>
+                <option value="متزوج">متزوج</option>
+                <option value="مطلق">مطلق</option>
+                <option value="أرمل">أرمل</option>
+              </select>
             </div>
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label for="diseaseType" class="form-label">نوع المرض</label>
-                <select id="diseaseType" class="form-control form-control-sm">
-                  <option value="">اختر نوع المرض</option>
+          </div>
+          
+          <!-- التشخيص والمرض -->
+          <h6 class="section-title mt-4 mb-2">
+            التشخيص والمرض <i class="fa-solid fa-stethoscope ms-1"></i>
+          </h6>
+          <hr class="soft-hr">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="diseaseType" class="form-label fw-bold mb-1">نوع المرض</label>
+              <select id="diseaseType" class="form-control form-control-sm text-center">
+                <option value="">اختر نوع المرض</option>
                   <option value="عدوى الفيروسات">عدوى الفيروسات</option>
                   <option value="عدوى البكتيريا">عدوى البكتيريا</option>
                   <option value="عدوى الفطريات">عدوى الفطريات</option>
@@ -189,302 +245,324 @@
                 </select>
               </div>
               <div class="col-md-6">
-                <label for="diagnosis" class="form-label">التشخيص</label>
-                <input type="text" class="form-control form-control-sm" id="diagnosis">
-              </div>
+              <label for="diagnosis" class="form-label fw-bold mb-1">التشخيص</label>
+              <input type="text" class="form-control form-control-sm text-center" id="diagnosis" placeholder="أدخل التشخيص">
             </div>
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label for="prescription" class="form-label">الوصفة الطبية</label>
-                <input type="text" class="form-control form-control-sm" id="prescription">
-              </div>
-              <div class="col-md-6">
-                <label for="treatmentDispensing" class="form-label">صرف العلاج</label>
-                <input type="text" class="form-control form-control-sm" id="treatmentDispensing">
-              </div>
+          </div>
+          
+          <!-- الوصفة والعلاج -->
+          <h6 class="section-title mt-4 mb-2">
+            الوصفة والعلاج <i class="fa-solid fa-capsules ms-1"></i>
+          </h6>
+          <hr class="soft-hr">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="prescription" class="form-label fw-bold mb-1">الوصفة الطبية</label>
+              <input type="text" class="form-control form-control-sm text-center" id="prescription" placeholder="اسم الدواء">
             </div>
-            <div class="row mb-3">
-              <div class="col-12">
-                <label for="externalTransfer" class="form-label">تحويل خارجي</label>
-                <select id="externalTransfer" class="form-control form-control-sm" onchange="handleExternalTransferChange()">
-                  <option value="لا">لا</option>
-                  <option value="نعم">نعم</option>
-                </select>
-              </div>
+            <div class="col-md-6">
+              <label for="treatmentDispensing" class="form-label fw-bold mb-1">صرف العلاج</label>
+              <input type="text" class="form-control form-control-sm text-center" id="treatmentDispensing" placeholder="تم الصرف">
             </div>
-            <!-- حقول التحويل الخارجي -->
-            <div id="hospitalFields" style="display: none;">
-              <div class="row mb-3">
-                <div class="col-md-6">
-                  <label for="hospitalName" class="form-label">اسم المستشفى</label>
-                  <input type="text" class="form-control form-control-sm" id="hospitalName">
-                </div>
-                <div class="col-md-3">
-                  <label for="externalTransferDate" class="form-label">تاريخ التحويل</label>
-                  <input type="date" class="form-control form-control-sm" id="externalTransferDate">
-                </div>
-                <div class="col-md-3">
-                  <label for="externalTransferTime" class="form-label">وقت التحويل</label>
-                  <input type="time" class="form-control form-control-sm" id="externalTransferTime">
-                </div>
-              </div>
-              <div class="row mb-3">
-                <div class="col-12">
-                  <label for="diseaseStatus" class="form-label">الحالة المرضية</label>
-                  <input type="text" class="form-control form-control-sm" id="diseaseStatus">
-                </div>
-              </div>
+          </div>
+          
+          <!-- التحويل الخارجي -->
+          <h6 class="section-title mt-4 mb-2">
+            التحويل الخارجي <i class="fa-solid fa-ambulance ms-1"></i>
+          </h6>
+          <hr class="soft-hr">
+          <!-- صف مركزي لحقل التحويل الخارجي -->
+          <div class="row g-3 mb-3 align-items-center justify-content-center">
+            <div class="col-12 col-sm-6 col-md-4 text-center">
+              <label for="externalTransfer" class="form-label fw-bold d-block mb-1">
+                هل يوجد تحويل خارجي؟
+              </label>
+              <select id="externalTransfer" class="form-select form-select-sm text-center">
+                <option value="لا" selected>لا</option>
+                <option value="نعم">نعم</option>
+              </select>
             </div>
-            <!-- نهاية حقول التحويل الخارجي -->
-            <div class="row mb-3">
-              <div class="col-12">
-                <label for="additionalNotes" class="form-label">ملاحظات إضافية</label>
-                <textarea id="additionalNotes" class="form-control form-control-sm" rows="3"></textarea>
-              </div>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer d-flex justify-content-center">
-          <button class="btn btn-primary me-2" onclick="saveTreatmentData()">
-            حفظ البيانات <i class="fa fa-save" style="margin-left:5px;"></i>
-          </button>
-          <button class="btn btn-secondary" data-bs-dismiss="modal">
-            إغلاق <i class="fa fa-times" style="margin-left:5px;"></i>
-          </button>
-        </div>
-      </div>
+          </div>
+          
+          <!-- عند اختيار "نعم" تظهر الحقول التالية -->
+          <div id="hospitalFields" style="display: none;">
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label for="hospitalName" class="form-label fw-bold mb-1">
+        اسم المستشفى <i class="fa-solid fa-hospital ms-1"></i>
+      </label>
+      <input type="text" class="form-control form-control-sm text-center" id="hospitalName" placeholder="اسم المستشفى">
+    </div>
+    <div class="col-md-3">
+      <label for="externalTransferDate" class="form-label fw-bold mb-1">
+        تاريخ التحويل <i class="fa-solid fa-calendar-days ms-1"></i>
+      </label>
+      <input type="date" class="form-control form-control-sm text-center" id="externalTransferDate">
+    </div>
+    <div class="col-md-3">
+      <label for="externalTransferTime" class="form-label fw-bold mb-1">
+        وقت التحويل <i class="fa-solid fa-clock ms-1"></i>
+      </label>
+      <input type="time" class="form-control form-control-sm text-center" id="externalTransferTime">
+    </div>
+    <div class="col-12">
+      <label for="diseaseStatus" class="form-label fw-bold mb-1">
+        حالة المريض <i class="fa-solid fa-stethoscope ms-1"></i>
+      </label>
+      <input type="text" class="form-control form-control-sm text-center" id="diseaseStatus" placeholder="">
     </div>
   </div>
-  
-  <!-- نافذة بيانات الوفاة -->
-  <div class="modal fade" id="deathDataModal" tabindex="-1" aria-labelledby="deathDataModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content custom-card shadow-sm">
-        <div class="modal-header">
-          <h5 class="modal-title w-100 text-center" id="deathDataModalLabel">
-            تحديث بيانات الوفاة <i class="fa fa-procedures" style="margin-left:5px;"></i>
-          </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
-        </div>
-        <div class="modal-body">
-          <form id="deathForm">
-            <div class="row mb-3">
-              <div class="col-12">
-                <label for="deathCause" class="form-label">سبب الوفاة</label>
-                <input type="text" class="form-control form-control-sm" id="deathCause">
-              </div>
+</div>
+
+          
+          <!-- الملاحظات الإضافية -->
+          <h6 class="section-title mt-4 mb-2">
+            ملاحظات إضافية <i class="fa-solid fa-sticky-note ms-1"></i>
+          </h6>
+          <hr class="soft-hr">
+          <div class="row g-3">
+            <div class="col-12">
+              <textarea id="additionalNotes" class="form-control form-control-sm text-center" rows="3" placeholder="اكتب أي ملاحظات إضافية"></textarea>
             </div>
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label for="deathHospital" class="form-label">المستشفى</label>
-                <input type="text" class="form-control form-control-sm" id="deathHospital">
-              </div>
-              <div class="col-md-6">
-                <label for="burialPlace" class="form-label">مكان الدفن</label>
-                <input type="text" class="form-control form-control-sm" id="burialPlace">
-              </div>
-            </div>
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label for="deathDate" class="form-label">تاريخ الوفاة</label>
-                <input type="date" class="form-control form-control-sm" id="deathDate">
-              </div>
-              <div class="col-md-6">
-                <label for="deathTime" class="form-label">الوقت</label>
-                <input type="time" class="form-control form-control-sm" id="deathTime">
-              </div>
-            </div>
-            <div class="row mb-3">
-              <div class="col-12">
-                <label for="deathNotes" class="form-label">ملاحظات</label>
-                <textarea class="form-control form-control-sm" id="deathNotes" rows="3"></textarea>
-              </div>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer d-flex justify-content-center">
-          <button class="btn btn-primary me-2" onclick="saveDeathData()">
-            حفظ بيانات الوفاة <i class="fa fa-save" style="margin-left:5px;"></i>
-          </button>
-          <button class="btn btn-secondary" data-bs-dismiss="modal">
-            إغلاق <i class="fa fa-times" style="margin-left:5px;"></i>
-          </button>
-        </div>
+          </div>
+        </form>
       </div>
+      
+      <!-- ترتيب الأزرار: "حفظ البيانات" على اليمين (أول عنصر في RTL)، و"إغلاق" على اليسار (ثاني عنصر) -->
+      <div class="modal-footer d-flex justify-content-between px-5">
+  <button class="btn btn-primary" id="saveTreatmentDataBtn">
+    حفظ البيانات <i class="fa-solid fa-floppy-disk ms-1"></i>
+  </button>
+  <button class="btn btn-secondary" data-bs-dismiss="modal">
+    إغلاق <i class="fa-solid fa-xmark ms-1"></i>
+  </button>
+</div>
+      
     </div>
   </div>
-  
-  <!-- نافذة التقارير المتكاملة -->
+</div>
+
+  <!-- نافذة بيانات الوفاة (عنصر مستقل) -->
+<div class="modal fade" id="deathDataModal" tabindex="-1" aria-labelledby="deathDataModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content custom-card shadow-sm">
+      
+      <!-- ترويسة النافذة: عنوان في المنتصف وزر إغلاق على اليسار -->
+      <div class="modal-header d-flex align-items-center justify-content-center position-relative">
+        <!-- زر الإغلاق في أقصى اليسار -->
+        <button type="button" class="btn-close position-absolute start-0 ms-2" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+        <!-- العنوان: النص أولاً ثم الأيقونة (me-1 تعني هامش في نهاية العنصر = يسار العنصر في RTL) -->
+        <h5 class="modal-title fw-bold m-0" id="deathDataModalLabel">
+          تحديث بيانات الوفاة <i class="fa-solid fa-bed-pulse me-1"></i>
+        </h5>
+      </div>
+      
+      <!-- محتوى النافذة -->
+      <div class="modal-body text-center" style="padding: 1.5rem 2rem;">
+        <form id="deathForm">
+          <!-- عنوان القسم: النص أولاً ثم الأيقونة -->
+          <h6 class="section-title mb-2">
+            معلومات الوفاة <i class="fa-solid fa-heart-crack me-1"></i>
+          </h6>
+          <hr class="soft-hr">
+          
+          <div class="row g-3">
+            <div class="col-12">
+              
+              <!-- حقل سبب الوفاة -->
+              <label for="deathCause" class="form-label fw-bold mb-1 w-100 text-center">
+                سبب الوفاة <i class="fa-solid fa-heart-crack me-1"></i>
+              </label>
+              <input type="text" class="form-control form-control-sm text-center" id="deathCause" placeholder="أدخل سبب الوفاة">
+              
+              <!-- حقل المستشفى -->
+              <label for="deathHospital" class="form-label fw-bold mb-1 w-100 text-center">
+                المستشفى <i class="fa-solid fa-hospital me-1"></i>
+              </label>
+              <input type="text" class="form-control form-control-sm text-center" id="deathHospital" placeholder="اسم المستشفى">
+              
+              <!-- حقل مكان الدفن -->
+              <label for="burialPlace" class="form-label fw-bold mb-1 w-100 text-center">
+                مكان الدفن <i class="fa-solid fa-map-marker-alt me-1"></i>
+              </label>
+              <input type="text" class="form-control form-control-sm text-center" id="burialPlace" placeholder="مكان الدفن">
+              
+              <!-- حقل تاريخ الوفاة -->
+              <label for="deathDate" class="form-label fw-bold mb-1 w-100 text-center">
+                تاريخ الوفاة <i class="fa-solid fa-calendar-days me-1"></i>
+              </label>
+              <input type="date" class="form-control form-control-sm text-center" id="deathDate">
+              
+              <!-- حقل وقت الوفاة -->
+              <label for="deathTime" class="form-label fw-bold mb-1 w-100 text-center">
+                وقت الوفاة <i class="fa-solid fa-clock me-1"></i>
+              </label>
+              <input type="time" class="form-control form-control-sm text-center" id="deathTime">
+              
+              <!-- ملاحظات الوفاة -->
+              <label for="deathNotes" class="form-label fw-bold mb-1 w-100 text-center">
+                ملاحظات <i class="fa-solid fa-sticky-note me-1"></i>
+              </label>
+              <textarea class="form-control form-control-sm text-center" id="deathNotes" rows="3" placeholder="اكتب أي ملاحظات إضافية"></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      
+      <!-- الفوتر: زر الحفظ على اليمين، وزر الإغلاق على اليسار (في RTL) -->
+      <div class="modal-footer d-flex justify-content-between">
+        <button class="btn btn-primary me-2" id="saveDeathDataBtn">
+          حفظ بيانات الوفاة <i class="fa-solid fa-floppy-disk ms-1"></i>
+        </button>
+        <button class="btn btn-secondary" data-bs-dismiss="modal">
+          إغلاق <i class="fa-solid fa-xmark ms-1"></i>
+        </button>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+
+  <!-- نافذة التقارير مع التبويبات -->
   <div class="modal fade" id="reportsModal" tabindex="-1" aria-labelledby="reportsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
-      <div class="modal-content custom-card shadow-sm">
-        <div class="modal-header justify-content-center">
-          <h5 class="modal-title w-100 fw-bold text-center" id="reportsModalLabel">
-            تقارير النظام <i class="fa fa-chart-bar" style="margin-left:5px;"></i>
+      <div class="modal-content shadow-lg">
+        <div class="modal-header" style="background-color: var(--light-gray);">
+          <h5 class="modal-title w-100 fw-bold text-black d-flex align-items-center justify-content-center" id="reportsModalLabel">
+            <i class="fa-solid fa-chart-bar me-2 fa-lg"></i> تقارير النظام
           </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
         </div>
-        <div class="modal-body">
-          <!-- تبويبات التقارير -->
-          <ul class="nav nav-tabs justify-content-center" id="reportsTab" role="tablist">
+        <div class="modal-body text-center">
+          <!-- تبويبات Nav-pills -->
+          <ul class="nav nav-pills nav-justified mb-4" id="reportsTab" role="tablist">
             <li class="nav-item" role="presentation">
-              <button class="nav-link active" id="transferred-tab" data-bs-toggle="tab" data-bs-target="#transferred" type="button" role="tab">
-                الحالات المحولة <i class="fa fa-ambulance" style="margin-left:5px;"></i>
+              <button class="nav-link active" id="transferred-tab" data-bs-toggle="pill" data-bs-target="#transferred" type="button" role="tab" aria-selected="true">
+                الحالات المحولة <i class="fa-solid fa-truck-medical ms-1"></i>
               </button>
             </li>
             <li class="nav-item" role="presentation">
-              <button class="nav-link" id="daily-tab" data-bs-toggle="tab" data-bs-target="#daily" type="button" role="tab">
-                عدد الزوار اليومي <i class="fa fa-users" style="margin-left:5px;"></i>
+              <button class="nav-link" id="daily-tab" data-bs-toggle="pill" data-bs-target="#daily" type="button" role="tab">
+                عدد الزوار اليومي <i class="fa-solid fa-users ms-1"></i>
               </button>
             </li>
             <li class="nav-item" role="presentation">
-              <button class="nav-link" id="patient-tab" data-bs-toggle="tab" data-bs-target="#patient" type="button" role="tab">
-                تقرير الحاج <i class="fa fa-user" style="margin-left:5px;"></i>
+              <button class="nav-link" id="patient-tab" data-bs-toggle="pill" data-bs-target="#patient" type="button" role="tab">
+                تقرير الحاج <i class="fa-solid fa-user ms-1"></i>
               </button>
             </li>
             <li class="nav-item" role="presentation">
-              <button class="nav-link" id="death-tab" data-bs-toggle="tab" data-bs-target="#death" type="button" role="tab">
-                تقرير الوفيات <i class="fa fa-procedures" style="margin-left:5px;"></i>
+              <button class="nav-link" id="death-tab" data-bs-toggle="pill" data-bs-target="#death" type="button" role="tab">
+                تقرير الوفيات <i class="fa-solid fa-bed-pulse ms-1"></i>
               </button>
             </li>
           </ul>
-          <div class="tab-content mt-3" id="reportsTabContent">
+          <div class="tab-content text-center" id="reportsTabContent">
             <!-- تبويب الحالات المحولة -->
-            <div class="tab-pane fade show active" id="transferred" role="tabpanel">
+            <div class="tab-pane fade show active" id="transferred" role="tabpanel" aria-labelledby="transferred-tab">
               <div class="card shadow-sm">
-                <div class="card-header d-flex align-items-center justify-content-between">
-                  <h5 class="mb-0">
-                    الحالات المحولة <i class="fa fa-ambulance" style="margin-left:5px;"></i>
+                <div class="card-header" style="background-color: var(--lighter-gray); position: relative;">
+                  <div style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%);">
+                    <button class="btn btn-sm btn-success me-2" onclick="exportReportExcel('transferredReportContent', '#transferredTable table')">
+                      Excel <i class="fa-solid fa-file-excel ms-1"></i>
+                    </button>
+                    <button class="btn btn-sm btn-pdf" onclick="exportReportPDF('transferredReportContent', '#transferredTable table')">
+                      PDF <i class="fa-solid fa-file-pdf ms-1"></i>
+                    </button>
+                  </div>
+                  <h5 class="mb-0 text-black text-center" style="margin: 0 auto;">
+                    الحالات المحولة <i class="fa-solid fa-truck-medical ms-1"></i>
                   </h5>
-                  <div>
-                    <button class="btn btn-pdf btn-sm me-2" onclick="exportReportPDF('transferredReportContent', '#transferredTable table')">
-                      PDF <i class="fa fa-file-pdf" style="margin-left:5px;"></i>
-                    </button>
-                    <button class="btn btn-success btn-sm" onclick="exportReportExcel('transferredReportContent', '#transferredTable table')">
-                      Excel <i class="fa fa-file-excel" style="margin-left:5px;"></i>
-                    </button>
-                  </div>
                 </div>
-                <div class="card-body">
-                  <div id="transferredReportContent">
-                    <!-- عرض تقرير الحالات المحولة هنا -->
-                  </div>
-                </div>
+                <div class="card-body text-center" id="transferredReportContent"></div>
               </div>
             </div>
-            
             <!-- تبويب عدد الزوار اليومي -->
-            <div class="tab-pane fade" id="daily" role="tabpanel">
+            <div class="tab-pane fade" id="daily" role="tabpanel" aria-labelledby="daily-tab">
               <div class="card shadow-sm">
-                <div class="card-header d-flex align-items-center justify-content-between">
-                  <h5 class="mb-0">
-                    عدد الزوار اليومي <i class="fa fa-users" style="margin-left:5px;"></i>
+                <div class="card-header" style="background-color: var(--lighter-gray); position: relative;">
+                  <div style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%);">
+                    <button class="btn btn-sm btn-success me-2" onclick="exportDailyExcel()">
+                      Excel <i class="fa-solid fa-file-excel ms-1"></i>
+                    </button>
+                    <button class="btn btn-sm btn-pdf" onclick="exportReportPDF('dailyReportContent', '#dailyTable table')">
+                      PDF <i class="fa-solid fa-file-pdf ms-1"></i>
+                    </button>
+                  </div>
+                  <h5 class="mb-0 text-black text-center" style="margin: 0 auto;">
+                    عدد الزوار اليومي <i class="fa-solid fa-users ms-1"></i>
                   </h5>
-                  <div>
-                    <button class="btn btn-pdf btn-sm me-2" onclick="exportReportPDF('dailyReportContent', '#dailyTable table')">
-                      PDF <i class="fa fa-file-pdf" style="margin-left:5px;"></i>
-                    </button>
-                    <button class="btn btn-success btn-sm" onclick="exportDailyExcel()">
-                      Excel <i class="fa fa-file-excel" style="margin-left:5px;"></i>
-                    </button>
-                  </div>
                 </div>
-                <div class="card-body">
-                  <div id="dailyReportContent">
-                    <!-- عرض تقرير عدد الزوار اليومي هنا -->
-                  </div>
-                </div>
+                <div class="card-body text-center" id="dailyReportContent"></div>
               </div>
             </div>
-            
             <!-- تبويب تقرير الحاج -->
-            <div class="tab-pane fade" id="patient" role="tabpanel">
+            <div class="tab-pane fade" id="patient" role="tabpanel" aria-labelledby="patient-tab">
               <div class="card shadow-sm">
-                <div class="card-header d-flex align-items-center justify-content-between">
-                  <h5 class="mb-0">
-                    تقرير الحاج <i class="fa fa-user" style="margin-left:5px;"></i>
+                <div class="card-header" style="background-color: var(--lighter-gray); position: relative;">
+                  <div style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%);">
+                    <button class="btn btn-sm btn-success me-2" onclick="exportReportExcel('patientReportContent', '#patientTable table')">
+                      Excel <i class="fa-solid fa-file-excel ms-1"></i>
+                    </button>
+                    <button class="btn btn-sm btn-pdf" onclick="exportReportPDF('patientReportContent', '#patientTable table')">
+                      PDF <i class="fa-solid fa-file-pdf ms-1"></i>
+                    </button>
+                  </div>
+                  <h5 class="mb-0 text-black text-center" style="margin: 0 auto;">
+                    تقرير الحاج <i class="fa-solid fa-user ms-1"></i>
                   </h5>
-                  <div>
-                    <button class="btn btn-pdf btn-sm me-2" onclick="exportReportPDF('patientReportContent', '#patientTable table')">
-                      PDF <i class="fa fa-file-pdf" style="margin-left:5px;"></i>
-                    </button>
-                    <button class="btn btn-success btn-sm" onclick="exportReportExcel('patientReportContent', '#patientTable table')">
-                      Excel <i class="fa fa-file-excel" style="margin-left:5px;"></i>
-                    </button>
-                  </div>
                 </div>
-                <div class="card-body">
-                  <!-- البحث برقم الجواز -->
-                  <div class="row g-2 align-items-end justify-content-center mb-3">
-                    <div class="col-md-4">
-                      <label for="patientPassport" class="form-label">رقم الجواز</label>
-                      <input type="text" id="patientPassport" class="form-control form-control-sm text-center">
-                    </div>
-                    <div class="col-md-2">
-                      <button class="btn btn-primary w-100" onclick="fetchPatientReport()">
-                        بحث <i class="fa fa-search" style="margin-left:5px;"></i>
-                      </button>
-                    </div>
+                <div class="card-body text-center">
+                  <div class="input-group mb-3" style="max-width: 250px; margin: 0 auto;">
+                    <input type="text" id="patientPassport" class="form-control form-control-sm text-center" placeholder="أدخل رقم الجواز">
+                    <button class="btn btn-primary btn-sm" id="fetchPatientReportBtn">
+                      بحث <i class="fa-solid fa-magnifying-glass ms-1"></i>
+                    </button>
                   </div>
-                  <div id="patientReportContent">
-                    <!-- عرض تقرير الحاج هنا -->
-                  </div>
+                  <div id="patientReportContent"></div>
                 </div>
               </div>
             </div>
-            
             <!-- تبويب تقرير الوفيات -->
-            <div class="tab-pane fade" id="death" role="tabpanel">
+            <div class="tab-pane fade" id="death" role="tabpanel" aria-labelledby="death-tab">
               <div class="card shadow-sm">
-                <div class="card-header d-flex align-items-center justify-content-between">
-                  <h5 class="mb-0">
-                    تقرير الوفيات <i class="fa fa-procedures" style="margin-left:5px;"></i>
+                <div class="card-header" style="background-color: var(--lighter-gray); position: relative;">
+                  <div style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%);">
+                    <button class="btn btn-sm btn-success me-2" onclick="exportReportExcel('deathReportContent', '#deathTable table')">
+                      Excel <i class="fa-solid fa-file-excel ms-1"></i>
+                    </button>
+                    <button class="btn btn-sm btn-pdf" onclick="exportReportPDF('deathReportContent', '#deathTable table')">
+                      PDF <i class="fa-solid fa-file-pdf ms-1"></i>
+                    </button>
+                  </div>
+                  <h5 class="mb-0 text-black text-center" style="margin: 0 auto;">
+                    تقرير الوفيات <i class="fa-solid fa-bed-pulse ms-1"></i>
                   </h5>
-                  <div>
-                    <button class="btn btn-pdf btn-sm me-2" onclick="exportReportPDF('deathReportContent', '#deathTable table')">
-                      PDF <i class="fa fa-file-pdf" style="margin-left:5px;"></i>
-                    </button>
-                    <button class="btn btn-success btn-sm" onclick="exportReportExcel('deathReportContent', '#deathTable table')">
-                      Excel <i class="fa fa-file-excel" style="margin-left:5px;"></i>
-                    </button>
-                  </div>
                 </div>
-                <div class="card-body">
-                  <div id="deathReportContent">
-                    <!-- عرض تقرير الوفيات هنا -->
-                  </div>
-                </div>
+                <div class="card-body text-center" id="deathReportContent"></div>
               </div>
             </div>
           </div>
         </div>
-      </div><!-- modal-content -->
-    </div><!-- modal-dialog -->
-  </div><!-- modal fade -->
+      </div>
+    </div>
+  </div>
 
-  <!-- تحميل المكتبات -->
+  <!-- تحميل المكتبات JavaScript -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  
-  <!-- Tempus Dominus JS (يمكن إبقاؤه إذا احتجته مستقبلاً) -->
-  <script type="module">
-    import { TempusDominus } from 'https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.2.7/dist/js/tempus-dominus.esm.js';
-    window.tempusDominus = { TempusDominus };
-    document.addEventListener('DOMContentLoaded', () => {
-      // يمكن تفعيل التقويم هنا عند الحاجة
-    });
-  </script>
-  
   <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
-  <!-- مكتبة ExcelJS لتصدير Excel -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
-  
-  <!-- ملف السكربت الخاص بنا -->
+  <script type="module">
+    import { TempusDominus } from 'https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.2.7/dist/js/tempus-dominus.esm.js';
+    window.tempusDominus = { TempusDominus };
+  </script>
   <script src="js/script.js"></script>
 </body>
 </html>

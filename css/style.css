@@ -1,37 +1,53 @@
 :root {
-  --primary-color: #003366;
-  --secondary-color: #f4f5f7;
+  /* ألوان مستوحاة من الشعار */
+  --gold-color: #c8a21d;
+  --gold-hover: #dbb222; 
+  --yemen-red: #d9534f;
+
+  --primary-color: var(--gold-color);
+  --secondary-color: #f8f9fa;
   --text-color: #333;
+  --light-gray: #eeeeee;
+  --lighter-gray: #f3f3f3;
+  --hover-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  --title-color: #333;
 }
 
-/* تنسيقات عامة */
-body, html {
+html, body {
   margin: 0;
   padding: 0;
   font-family: 'Cairo', sans-serif;
   font-size: 16px;
-  color: var(--text-color);
   direction: rtl;
-  text-align: center;
-}
-
-.bg-body {
+  color: var(--text-color);
   background-color: var(--secondary-color);
-  min-height: 100vh;
 }
 
-.logo-index, .logo-dashboard {
-  width: 400px;
+.modal-footer {
+  display: flex !important;
+  justify-content: space-between !important;
+  width: 100%;
+}
+
+.logo-dashboard {
+  width: 340px;
   max-width: 100%;
+  margin-bottom: 20px;
 }
 
-/* تأثير ظهور */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 .fade-in {
-  animation: fadeIn 0.5s ease-in;
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+.slogan {
+  white-space: nowrap;
+  font-size: 1.4rem;
+  color: var(--gold-color);
+  font-weight: 700;
 }
 
 /* الكروت */
@@ -45,7 +61,7 @@ body, html {
   transition: box-shadow 0.3s, transform 0.3s;
 }
 .custom-card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: var(--hover-shadow);
   transform: scale(1.01);
 }
 
@@ -53,56 +69,63 @@ body, html {
 .card-header {
   border-top-left-radius: 8px !important;
   border-top-right-radius: 8px !important;
-  background-color: var(--primary-color) !important;
+  background-color: var(--gold-color) !important;
   color: #fff !important;
   padding: 10px 15px;
-  text-align: center;
 }
 
-/* عنوان الكارت */
+/* عناوين الكارت */
 .card-title {
-  font-size: 1.4rem;
-  color: #212529;
-  font-weight: 700;
+  font-size: 1.3rem;
   margin-bottom: 1rem;
+  color: var(--title-color);
+  font-weight: 700;
+}
+
+/* حقول الإدخال */
+.form-control:focus {
+  border-color: var(--gold-color);
+  box-shadow: 0 0 5px rgba(200,162,29,0.3);
+}
+
+/* تحسين حجم حقول الإدخال */
+.custom-card input.form-control-sm {
+  width: 80%; /* تقليل عرض الحقول */
+  max-width: 280px; /* تعيين حد أقصى للعرض */
+  padding: 6px; /* تقليل المسافة الداخلية */
+  font-size: 14px; /* تصغير الخط */
+  border-radius: 6px; /* جعل الحواف أكثر انسيابية */
+  text-align: center; /* توسيط النص داخل الحقول */
+  margin: 0 auto; /* التأكد من أن العناصر تبقى متناسقة */
+  border: 2px solid var(--gold-color) !important; /* إضافة حواف ذهبية */
+}
+
+/* الرسائل */
+.message {
+  font-weight: bold;
+  color: red;
 }
 
 /* الجداول */
 .table {
   width: 100%;
   margin: 0 auto;
+  text-align: center;
 }
-
-/* هذه الفئة تجعل الجدول يبدأ فعليًا من اليمين */
 .rtl-table {
   direction: rtl;
   unicode-bidi: bidi-override;
 }
-
 .table-responsive {
   margin-top: 15px;
   max-height: 500px;
   overflow: auto;
 }
-
 .table th,
 .table td {
   white-space: nowrap;
-  text-overflow: ellipsis;
-  min-width: 70px;
   vertical-align: middle;
-  text-align: center;
-}
-
-.message {
-  font-weight: bold;
-  color: red;
-}
-
-/* تركيز الحقول */
-.form-control:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 6px rgba(0,51,102,0.3);
+  min-width: 70px;
 }
 
 /* الأزرار */
@@ -117,89 +140,135 @@ body, html {
   transform: scale(1.01);
 }
 
-/* أزرار مخصصة */
-.btn-medical {
-  background-color: #c8e6c9;
-  color: #333;
+.btn-gold {
+  background-color: var(--gold-color);
+  color: #fff;
   border: none;
 }
-.btn-medical:hover {
-  background-color: #a5d6a7;
-  color: #333;
+.btn-gold:hover {
+  background-color: var(--gold-hover);
+  color: #fff;
 }
 
-.btn-report {
-  background-color: #bbdefb;
-  color: #333;
-  border: none;
+.btn-outline-gold {
+  border: 2px solid var(--gold-color);
+  color: var(--gold-color);
+  background-color: transparent;
 }
-.btn-report:hover {
-  background-color: #90caf9;
-  color: #333;
+.btn-outline-gold:hover {
+  background-color: var(--gold-color);
+  color: #fff;
 }
 
 .btn-pdf {
-  background-color: #b71c1c;
+  background-color: var(--yemen-red);
   color: #fff;
   border: none;
 }
 .btn-pdf:hover {
-  background-color: #d32f2f;
+  background-color: #b52f2b;
   color: #fff;
 }
 
-.btn-success {
+.btn-medical {
+  background-color: #d4edda;
+  color: #055160;
+  border: 1px solid #c3e6cb;
+}
+.btn-medical:hover {
+  background-color: #c3e6cb;
+  color: #053742;
+}
+
+/* تبويبات Nav-pills */
+.nav-pills .nav-link {
+  border-radius: 0.4rem;
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
+  font-size: 0.95rem;
   font-weight: 600;
 }
-.btn-success:hover {
-  transform: scale(1.01);
+.nav-pills .nav-link.active {
+  background-color: var(--gold-color);
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.nav-pills .nav-link:hover {
+  background-color: rgba(200,162,29,0.1);
 }
 
-/* حاوية التنبيه المخصص */
-.custom-toast {
-  border-radius: 5px;
-  font-weight: 600;
+/* رأس الـModal */
+.modal-header {
+  background-color: var(--light-gray) !important;
+}
+.modal-header .fa-lg {
+  font-size: 1.4rem;
 }
 
-select.form-control {
-  text-align: right;
+/* خلفية تبويبات التقارير */
+.card-header[style] {
+  background-color: var(--lighter-gray) !important;
+  color: #000 !important;
+}
+.card-header[style] h5,
+.card-header[style] .fa {
+  color: #000 !important;
 }
 
-.input-group-text {
-  background-color: #e9ecef;
-  border: 1px solid #ced4da;
-}
-
-.slogan {
-  white-space: nowrap;
-  font-size: 1.5rem;
-  color: var(--primary-color);
-  margin-top: 8px;
+/* عناوين الأقسام داخل النوافذ */
+.section-title {
   font-weight: 700;
-}
-
-/* تنسيق التبويبات */
-.nav-tabs .nav-link {
+  color: var(--gold-color);
+  font-size: 1rem;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.25rem; /* مسافة بسيطة بين النص والأيقونة */
-  font-weight: 600;
-  font-size: 0.95rem;
+  gap: 5px;
 }
 
-.nav-tabs .nav-link i {
-  font-size: 1rem;
-}
-
-/* التبويب النشط */
-.nav-tabs .nav-link.active {
-  background-color: var(--primary-color);
-  color: #fff !important;
+/* فاصل خفيف */
+.soft-hr {
   border: none;
+  height: 1px;
+  background-color: #ccc;
+  opacity: 0.4;
+  margin: 0.8rem 0;
 }
 
-/* تباعد بسيط في البطاقات الداخلية للتقارير */
-.card-body {
-  padding: 1.5rem;
+/* تكبير الحقول داخل قسم التحويل الخارجي */
+#hospitalFields .form-control-sm {
+  font-size: 1rem !important;   /* أو أي قيمة أكبر */
+  padding: 0.75rem !important;  /* زيادة الحشو */
+  height: auto !important;      /* السماح للعنصر بالتمدد */
+}
+
+/* تحسين زر البحث */
+.custom-card button {
+  width: 60%; /* تقليل عرض الزر */
+  max-width: 180px; /* تحديد حد أقصى للعرض */
+  padding: 8px 12px; /* تصغير ارتفاع الزر */
+  font-size: 14px; /* تقليل حجم الخط داخل الزر */
+  border-radius: 6px; /* جعل الزر أكثر انسيابية */
+  display: block;
+  margin: 0 auto; /* توسيط الزر */
+}
+
+/* جعل زر البحث أكثر جمالية عند التمرير */
+.custom-card button:hover {
+  background-color: var(--gold-hover);
+  transform: scale(1.05); /* تكبير طفيف عند التمرير */
+}
+
+.modal-footer {
+  display: flex !important;
+  justify-content: space-between !important;
+  width: 100%;
+  padding: 10px 15px; /* تحسين التباعد */
+}
+
+.modal-footer .btn-secondary {
+  margin-right: auto !important; /* دفع زر الإغلاق إلى أقصى اليسار */
+}
+
+.modal-footer .btn-primary {
+  margin-left: auto !important; /* دفع زر الحفظ إلى أقصى اليمين */
 }
